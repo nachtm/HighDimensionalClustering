@@ -1,144 +1,102 @@
 package spinacht;
 
+import java.util.Optional;
 import java.util.Comparator;
 import java.util.function.Consumer;
 
 // snippets of rb-tree from http://algs4.cs.princeton.edu/33balanced/RedBlackBST.java.html
 class RangeTree<T> {
 
-  private static final boolean RED   = true;
+  private static final boolean RED = true;
   private static final boolean BLACK = false;
 
   private class Node {
 
-      private T val;
-      private Node left, right;
-      private boolean color;
-      private int size;
+      private final T value;
+      private final Optional<Node> left, right;
+      private final boolean color;
 
-      public Node(T val, boolean color, int size) {
-          this.val = val;
-          this.color = color;
-          this.size = size;
+      public Node(T value, boolean color, Optional<Node> left, Optional<Node> right) {
+        this.value = value;
+        this.color = color;
+        this.left = left;
+        this.right = right;
       }
 
   }
 
-  private Node root = null;
-  private final Comparator<T> comp;
+  private Optional<Node> root = Optional.empty();
+  private final Comparator<T> cmp;
 
-  RangeTree(Comparator<T> comp) {
-    this.comp = comp;
+  RangeTree(Comparator<T> cmp) {
+    this.cmp = cmp;
+  }
+
+  void insert(T value) {
+    root = insert(root, value);
+  }
+
+  private Optional<Node> insert(Optional<Node> node, T value) {
+    return Optional.of(
+        node.map(n -> {
+
+          final Node m = cmp.compare(value, n.value) < 0
+                       ? new Node(n.value, n.color, insert(n.left, value), n.right)
+                       : new Node(n.value, n.color, n.left, insert(n.right, value))
+                       ;
+
+          // if (isRed(n.right) && !isRed(n.left)) {
+          //   n = rotateLeft(n);
+          // }
+          // if (isRed(n.left) && n.left.map(left -> isRed(left.left)).orElse(false)) {
+          //   n = rotateRight(n);
+          // }
+          // if (isRed(n.left) && isRed(n.right)) {
+          //   flipColors(n);
+          // }
+
+          return m;
+
+      }).orElse(new Node(value, RED, Optional.empty(), Optional.empty()))
+    );
   }
 
   void forEachInRange(T lo, T hi, Consumer<T> consumer) {
     traverse(root, lo, hi, consumer);
   }
 
-  private void traverse(Node node, T lo, T hi, Consumer<T> consumer) {
-    if (node != null) {
-      if (comp.compare(node.val, lo) < 0) {
-        traverse(node.right, lo, hi, consumer);
-      } else if (comp.compare(node.val, hi) > 0) {
-        traverse(node.left, lo, hi, consumer);
+  private void traverse(Optional<Node> node, T lo, T hi, Consumer<T> consumer) {
+    node.ifPresent(n -> {
+      if (cmp.compare(n.value, lo) < 0) {
+        traverse(n.right, lo, hi, consumer);
+      } else if (cmp.compare(n.value, hi) > 0) {
+        traverse(n.left, lo, hi, consumer);
       } else {
-        traverseRight(node.left, lo, consumer);
-        consumer.accept(node.val);
-        traverseLeft(node.right, lo, consumer);
+        traverseRight(n.left, lo, consumer);
+        consumer.accept(n.value);
+        traverseLeft(n.right, lo, consumer);
       }
-    }
+    });
   }
 
-  private void traverseRight(Node node, T lo, Consumer<T> consumer) {
-    if (node != null) {
-      if (comp.compare(node.val, lo) >= 0) {
-        traverseRight(node.left, lo, consumer);
-        consumer.accept(node.val);
+  private void traverseRight(Optional<Node> node, T lo, Consumer<T> consumer) {
+    node.ifPresent(n -> {
+      if (cmp.compare(n.value, lo) >= 0) {
+        traverseRight(n.left, lo, consumer);
+        consumer.accept(n.value);
       }
-      traverseRight(node.right, lo, consumer);
-    }
+      traverseRight(n.right, lo, consumer);
+    });
   }
 
-  private void traverseLeft(Node node, T hi, Consumer<T> consumer) {
-    if (node != null) {
-      traverseLeft(node.left, hi, consumer);
-      if (comp.compare(node.val, hi) <= 0) {
-        consumer.accept(node.val);
-        traverseLeft(node.right, hi, consumer);
+  private void traverseLeft(Optional<Node> node, T hi, Consumer<T> consumer) {
+    node.ifPresent(n -> {
+      traverseLeft(n.left, hi, consumer);
+      if (cmp.compare(n.value, hi) <= 0) {
+        consumer.accept(n.value);
+        traverseLeft(n.right, hi, consumer);
       }
-    }
-  }
-
-  void insert(T val) {
-    root = insert(root, val);
-  }
-
-  private Node insert(Node node, T val) {
-
-    if (node == null) {
-
-      return new Node(val, RED, 1);
-
-    } else {
-
-      if (comp.compare(val, node.val) < 0) {
-        node.left = insert(node.left, val);
-      } else {
-        node.right = insert(node.right, val);
-      }
-
-      if (isRed(node.right) && !isRed(node.left)) {
-        node = rotateLeft(node);
-      }
-      if (isRed(node.left) && isRed(node.left.left)) {
-        node = rotateRight(node);
-      }
-      if (isRed(node.left) && isRed(node.right)) {
-        flipColors(node);
-      }
-
-      node.size = size(node.left) + size(node.right) + 1;
-
-      return node;
-
-    }
-
-  }
-
-  private boolean isRed(Node node) {
-    return node != null && node.color == RED;
-  }
-
-  private int size(Node node) {
-    return node == null ? 0 : node.size;
-  }
-
-  private Node rotateRight(Node node) {
-      Node left = node.left;
-      node.left = left.right;
-      left.right = node;
-      left.color = left.right.color;
-      left.right.color = RED;
-      left.size = node.size;
-      node.size = size(node.left) + size(node.right) + 1;
-      return left;
-  }
-
-  private Node rotateLeft(Node node) {
-      Node right = node.right;
-      node.right = right.left;
-      right.left = node;
-      right.color = right.left.color;
-      right.left.color = RED;
-      right.size = node.size;
-      node.size = size(node.left) + size(node.right) + 1;
-      return right;
-  }
-
-  private void flipColors(Node node) {
-      node.color = !node.color;
-      node.left.color = !node.left.color;
-      node.right.color = !node.right.color;
+    });
   }
 
 }
