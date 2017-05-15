@@ -1,4 +1,4 @@
-package spinacht;
+package spinacht.viz;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
