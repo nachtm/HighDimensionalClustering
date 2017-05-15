@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class Visualizer extends Application {
 
-    public static final String outpath = "points.txt";
+    public static final String outpath = "outfiles/points.txt";
 
     @Override
     public void start(Stage primaryStage) throws Exception {
