@@ -14,12 +14,10 @@ class RangeTree<T> {
       private T val;
       private Node left, right;
       private boolean color;
-      private int size;
 
-      public Node(T val, boolean color, int size) {
+      public Node(T val, boolean color) {
           this.val = val;
           this.color = color;
-          this.size = size;
       }
 
   }
@@ -77,7 +75,7 @@ class RangeTree<T> {
 
     if (node == null) {
 
-      return new Node(val, RED, 1);
+      return new Node(val, RED);
 
     } else {
 
@@ -97,8 +95,6 @@ class RangeTree<T> {
         flipColors(node);
       }
 
-      node.size = size(node.left) + size(node.right) + 1;
-
       return node;
 
     }
@@ -109,18 +105,12 @@ class RangeTree<T> {
     return node != null && node.color == RED;
   }
 
-  private int size(Node node) {
-    return node == null ? 0 : node.size;
-  }
-
   private Node rotateRight(Node node) {
       Node left = node.left;
       node.left = left.right;
       left.right = node;
       left.color = left.right.color;
       left.right.color = RED;
-      left.size = node.size;
-      node.size = size(node.left) + size(node.right) + 1;
       return left;
   }
 
@@ -130,8 +120,6 @@ class RangeTree<T> {
       right.left = node;
       right.color = right.left.color;
       right.left.color = RED;
-      right.size = node.size;
-      node.size = size(node.left) + size(node.right) + 1;
       return right;
   }
 
