@@ -35,9 +35,9 @@ public class RangeTreeTest extends TestCase {
       rt.insert(0);
       rt.insert(1);
 
-      rt.forEachInRange(-100, 1000, x -> System.out.println(x));
+      rt.forEachInRange(-100, 1000, System.out::println);
       System.out.println();
-      rt.forEachInRange(3, 30, x -> System.out.println(x));
+      rt.forEachInRange(3, 30, System.out::println);
 
     }
 

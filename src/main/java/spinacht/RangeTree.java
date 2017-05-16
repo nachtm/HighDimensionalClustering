@@ -42,7 +42,7 @@ class RangeTree<T> {
       } else {
         traverseRight(node.left, lo, consumer);
         consumer.accept(node.val);
-        traverseLeft(node.right, lo, consumer);
+        traverseLeft(node.right, hi, consumer);
       }
     }
   }
