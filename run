@@ -1,2 +1,2 @@
 #!/bin/sh
-java -cp target/spinacht-1.0-SNAPSHOT.jar "$1"
+java -cp ./build/classes/main "$@"
