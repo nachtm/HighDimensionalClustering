@@ -68,12 +68,6 @@ class RangeTree<T> {
     }
   }
 
-  void insert(Collection<T> vals){
-      for(T val : vals){
-          insert(val);
-      }
-  }
-
   void insert(T val) {
     root = insert(root, val);
   }
