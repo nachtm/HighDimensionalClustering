@@ -1,5 +1,6 @@
-package spinacht;
+package spinacht.dbscan;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.function.Consumer;
 
@@ -65,6 +66,12 @@ class RangeTree<T> {
         traverseLeft(node.right, hi, consumer);
       }
     }
+  }
+
+  void insert(Collection<T> vals){
+      for(T val : vals){
+          insert(val);
+      }
   }
 
   void insert(T val) {

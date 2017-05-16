@@ -1,13 +1,10 @@
-package spinacht;
+package spinacht.dbscan;
 
 import java.util.Comparator;
-import java.util.LinkedList;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
-import spinacht.RangeTree;
 
 
 public class RangeTreeTest extends TestCase {

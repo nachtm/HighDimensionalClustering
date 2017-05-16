@@ -8,7 +8,7 @@ import java.util.Set;
  */
 public interface RangeTrees {
 
-    Set<Point> getWithinRange(Subspace s, Point p, double epsilon);
+//    Set<Point> getWithinRange(Subspace s, Point p, double epsilon);
 
     //should return a set including p!!!
     List<Point> getWithinRangeFilteredBy(Subspace s, Point p, double epsilon, Set<Point> superset);
