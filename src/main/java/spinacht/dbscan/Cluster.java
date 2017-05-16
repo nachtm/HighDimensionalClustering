@@ -6,4 +6,6 @@ package spinacht.dbscan;
 public interface Cluster extends Iterable<Point>{
 
     int size();
+
+    Point get(int i);
 }
