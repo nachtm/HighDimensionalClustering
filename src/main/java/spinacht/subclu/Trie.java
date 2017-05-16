@@ -9,7 +9,7 @@ import spinacht.common.Subset;
 import spinacht.common.Params;
 
 
-class Trie implements Iterable<Cluster> {
+class Trie implements Clustering {
 
   private final DBSCAN dbscan;
   private final Params params;
@@ -68,6 +68,20 @@ class Trie implements Iterable<Cluster> {
         sum += cluster.size();
       }
       this.npoints = sum;
+    }
+
+    Iterator<Integer> reversedPath() {
+      return new Iterator<Integer>() {
+        private Node curr = Node.this;
+        public boolean hasNext() {
+          return this.curr != null;
+        }
+        public Integer next() {
+          int last = this.curr.upEdge;
+          this.curr = curr.parent;
+          return last;
+        }
+      };
     }
 
     boolean extend(int k, Node[] marks, LinkedList<Integer> path) {

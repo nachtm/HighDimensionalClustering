@@ -9,7 +9,7 @@ import spinacht.common.Params;
 
 public class SUBCLU {
 
-  static Iterable<Cluster> go(Params params) {
+  static Clustering go(Params params) {
     Trie trie = new Trie(params);
     while (trie.extend());
     return trie;
