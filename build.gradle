@@ -10,5 +10,11 @@ repositories {
 
 dependencies {
     compile 'com.google.guava:guava:21.0'
+    compile 'com.opencsv:opencsv:3.9'
     testCompile 'junit:junit:4.12'
+}
+
+task run(type: JavaExec) {
+   main = "$arg1"
+   classpath = sourceSets.main.runtimeClasspath
 }

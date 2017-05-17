@@ -1,2 +1,2 @@
 #!/bin/sh
-java -cp ./build/classes/main "$@"
+./gradlew run -Parg1="spinacht.$1"
