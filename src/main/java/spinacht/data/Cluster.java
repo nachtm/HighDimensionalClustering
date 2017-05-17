@@ -1,4 +1,4 @@
-package spinacht.common;
+package spinacht.data;
 
 import java.lang.Iterable;
 

@@ -4,7 +4,7 @@ import java.lang.Iterable;
 import java.util.Collection;
 
 import spinacht.common.Params;
-import spinacht.common.Subset;
+import spinacht.data.Subset;
 
 
 public class DBSCAN {

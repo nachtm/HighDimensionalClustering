@@ -3,7 +3,7 @@ package spinacht.subclu;
 import java.lang.Iterable;
 
 import spinacht.subclu.Trie;
-import spinacht.common.Cluster;
+import spinacht.data.Clustering;
 import spinacht.common.Params;
 
 

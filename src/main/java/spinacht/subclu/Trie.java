@@ -2,10 +2,13 @@ package spinacht.subclu;
 
 import java.lang.*;
 import java.util.*;
+import java.util.function.*;
 
 import spinacht.dbscan.DBSCAN;
-import spinacht.common.Cluster;
-import spinacht.common.Subset;
+import spinacht.data.Cluster;
+import spinacht.data.Clustering;
+import spinacht.data.Subset;
+import spinacht.data.Subspace;
 import spinacht.common.Params;
 
 
@@ -23,20 +26,24 @@ class Trie implements Clustering {
     return root.extend(0, new Node[this.params.getDatabase().getDimensionality()], new LinkedList<>());
   }
 
-  public Iterator<Cluster> iterator() {
-    return new Iterator<Cluster>() {
-      public boolean hasNext() {
-        return false;
-      }
-      public Cluster next() {
-        return null;
-      }
-    };
+  public void forEachCluster(Function<Subspace, Consumer<Subset>> f) {
+    this.root.forEachCluster(f);
   }
+
+  // public Iterator<Cluster> iterator() {
+  //   return new Iterator<Cluster>() {
+  //     public boolean hasNext() {
+  //       return false;
+  //     }
+  //     public Cluster next() {
+  //       return null;
+  //     }
+  //   };
+  // }
 
   private Node root;
 
-  private class Node {
+  private class Node implements Subspace, Clustering {
 
     final Node parent;
     final int upEdge;
@@ -49,7 +56,7 @@ class Trie implements Clustering {
       this.parent = null;
       this.upEdge = -1;
       this.children = new HashMap<>();
-      Subset everything = Trie.this.params.getDatabase().everything();
+      Subset everything = new Subset(Trie.this.params.getDatabase());
       for (int i = 0; i < Trie.this.params.getDatabase().getDimensionality(); i++) {
         this.children.put(i, new Node(this, i, dbscan.go(everything, Arrays.asList(i))));
       }
@@ -70,7 +77,16 @@ class Trie implements Clustering {
       this.npoints = sum;
     }
 
-    Iterator<Integer> reversedPath() {
+    public void forEachCluster(Function<Subspace, Consumer<Subset>> f) {
+      this.clusters.forEach(f.apply(this));
+      if (this.children != null) {
+        for (Node child : children.values()) {
+          child.forEachCluster(f);
+        }
+      }
+    }
+
+    public Iterator<Integer> iterator() {
       return new Iterator<Integer>() {
         private Node curr = Node.this;
         public boolean hasNext() {
