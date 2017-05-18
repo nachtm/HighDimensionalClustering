@@ -3,56 +3,59 @@ package spinacht.dbscan;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import spinacht.common.*;
+import spinacht.data.*;
+import spinacht.index.*;
+
 /**
  * DBSCAN as implemented by the original paper.
  * Created by nachtm on 5/15/17.
  */
-public class PaperDBScanner implements DBSCANNER{
+public class PaperDBScanner {
 
     public static final int CLUSTER_START = 0;
     public static final int UNCLASSIFIED = -1;
     public static final int NOISE = -2;
     private double eps;
     private int minPts;
+    private Index index;
 
-    public PaperDBScanner(double eps, int minPts){
+    public PaperDBScanner(double eps, int minPts, Index index){
         this.eps = eps;
         this.minPts = minPts;
+        this.index = index;
     }
 
 
     //TODO: implement rangeTrees and insert here.
-    @Override
-    public Iterable<Cluster> dbscan(Subspace space, Set<Point> setOfPoints) {
-        return clusterify(new DBScannerInstance(null, space, setOfPoints, eps, minPts).dbscan());
+    public Collection<Subset> dbscan(Subspace space, Subset setOfPoints) {
+        return clusterify(new DBScannerInstance(space, setOfPoints, eps, minPts).dbscan());
     }
 
-    private static List<Cluster> clusterify(Map<Point, Integer> labels){
-        Map<Integer, List<Point>> reverse = new HashMap<>();
+    private static Collection<Subset> clusterify(Map<Point, Integer> labels){
+        Map<Integer, Subset> reverse = new HashMap<>();
         for(Point p : labels.keySet()){
             if(reverse.containsKey(labels.get(p))){
                 reverse.get(labels.get(p)).add(p);
             } else{
-                List<Point> pointList = new LinkedList<>();
+                Subset pointList = new Subset();
                 pointList.add(p);
                 reverse.put(labels.get(p), pointList);
             }
         }
 
-        return reverse.keySet().stream().map(k -> new ListCluster(reverse.get(k))).collect(Collectors.toList());
+        return reverse.values();
     }
 
     private class DBScannerInstance {
 
-        RangeTrees rt;
         Subspace space;
-        Set<Point> setOfPoints;
+        Subset setOfPoints;
         double eps;
         int minPts;
         Map<Point, Integer> labels;
 
-        DBScannerInstance(RangeTrees rangeTrees, Subspace space, Set<Point> setOfPoints, double eps, int minPts){
-            rt = rangeTrees;
+        DBScannerInstance(Subspace space, Subset setOfPoints, double eps, int minPts){
             this.space = space;
             this.setOfPoints = setOfPoints;
             this.eps = eps;
@@ -80,7 +83,7 @@ public class PaperDBScanner implements DBSCANNER{
         }
 
         boolean expandClusters(Point p, int clusterId){
-            List<Point> seeds = rt.getWithinRangeFilteredBy(space, p, eps, setOfPoints);
+            Subset seeds = PaperDBScanner.this.index.epsNeighborhood(eps, p, space, setOfPoints);
             assert seeds.contains(p); //O(seeds.size())
             if(seeds.size() < minPts){
                 labels.put(p, NOISE);
@@ -88,12 +91,12 @@ public class PaperDBScanner implements DBSCANNER{
                 changeIds(seeds, clusterId);
             }
             seeds.remove(p); //O(seeds.size())
-            while(!seeds.isEmpty()){
-                Point currP = seeds.get(0);
-                List<Point> result = rt.getWithinRangeFilteredBy(space, currP, eps, setOfPoints);
+            for (Iterator<Point> it = seeds.iterator(); it.hasNext();) {
+                Point currP = it.next();
+                it.remove();
+                Subset result = PaperDBScanner.this.index.epsNeighborhood(eps, p, space, setOfPoints);
                 if(result.size() >= minPts){
-                    for(int i = 0; i < result.size(); i++){
-                        Point resultP = result.get(i);
+                    for (Point resultP : result) {
                         int resultPLabel = labels.get(resultP);
                         if(resultPLabel == UNCLASSIFIED || resultPLabel == NOISE){
                             if(resultPLabel == UNCLASSIFIED){
@@ -103,12 +106,11 @@ public class PaperDBScanner implements DBSCANNER{
                         }
                     }
                 }
-                seeds.remove(currP); //O(seeds.size())
             }
             return true;
         }
 
-        void changeIds(List<Point> points, int toChange){
+        void changeIds(Subset points, int toChange){
             for(Point p : points){
                 labels.put(p, toChange);
             }

@@ -1,2 +1,2 @@
 #!/bin/sh
-./gradlew run -Parg1="spinacht.$1"
+# ./gradlew run -Parg1="spinacht.$1"

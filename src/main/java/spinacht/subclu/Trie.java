@@ -9,21 +9,27 @@ import spinacht.data.Cluster;
 import spinacht.data.Clustering;
 import spinacht.data.Subset;
 import spinacht.data.Subspace;
+import spinacht.data.SubspaceWrapper;
 import spinacht.common.Params;
+import spinacht.index.Index;
 
 
 class Trie implements Clustering {
 
   private final DBSCAN dbscan;
   private final Params params;
+  private final Node root;
 
   Trie(Params params) {
-    this.dbscan = new DBSCAN(params);
+    this.dbscan = new DBSCAN(params, new Index(params.getDatabase()));
     this.params = params;
+    this.root = new Node();
   }
 
   boolean extend() {
-    return root.extend(0, new Node[this.params.getDatabase().getDimensionality()], new LinkedList<>());
+    Node[] a = new Node[this.params.getDatabase().getDimensionality()];
+    return root.extend(0, a, new LinkedList<>());
+    // return root.extend(0, new Node[this.params.getDatabase().getDimensionality()], new LinkedList<>());
   }
 
   public void forEachCluster(Function<Subspace, Consumer<Subset>> f) {
@@ -41,8 +47,6 @@ class Trie implements Clustering {
   //   };
   // }
 
-  private Node root;
-
   private class Node implements Subspace, Clustering {
 
     final Node parent;
@@ -58,7 +62,7 @@ class Trie implements Clustering {
       this.children = new HashMap<>();
       Subset everything = new Subset(Trie.this.params.getDatabase());
       for (int i = 0; i < Trie.this.params.getDatabase().getDimensionality(); i++) {
-        this.children.put(i, new Node(this, i, dbscan.go(everything, Arrays.asList(i))));
+        this.children.put(i, new Node(this, i, dbscan.go(everything, new SubspaceWrapper(Arrays.asList(i)))));
       }
       this.clusters = Collections.EMPTY_SET;
       this.npoints = 0;
@@ -90,7 +94,7 @@ class Trie implements Clustering {
       return new Iterator<Integer>() {
         private Node curr = Node.this;
         public boolean hasNext() {
-          return this.curr != null;
+          return this.curr.parent != null;
         }
         public Integer next() {
           int last = this.curr.upEdge;
@@ -103,7 +107,7 @@ class Trie implements Clustering {
     boolean extend(int k, Node[] marks, LinkedList<Integer> path) {
       if (this.children == null) {
         Set<Integer> candidates = new HashSet<>(marks[0].children.keySet());
-        for (int i = 1; i < marks.length; i++) {
+        for (int i = 1; i < k; i++) {
           candidates.retainAll(marks[i].children.keySet());
         }
         this.children = new HashMap<>();
@@ -118,7 +122,7 @@ class Trie implements Clustering {
             }
             List<Subset> clusters = new LinkedList<>();
             for (Subset cluster : bestSubspace.clusters) {
-              for (Subset c : dbscan.go(cluster, path)) {
+              for (Subset c : dbscan.go(cluster, new SubspaceWrapper(path))) {
                 clusters.add(c);
               }
             }

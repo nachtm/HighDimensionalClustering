@@ -11,14 +11,14 @@ class RangeTree<T> {
 
   private class Node {
 
-      private T val;
-      private Node left, right;
-      private boolean color;
+    private T val;
+    private Node left, right;
+    private boolean color;
 
-      public Node(T val, boolean color) {
-          this.val = val;
-          this.color = color;
-      }
+    public Node(T val, boolean color) {
+      this.val = val;
+      this.color = color;
+    }
 
   }
 
@@ -27,6 +27,13 @@ class RangeTree<T> {
 
   RangeTree(ToDoubleFunction<T> key) {
     this.key = key;
+  }
+
+  RangeTree(Iterable<T> values, ToDoubleFunction<T> key) {
+    this(key);
+    for (T value : values) {
+      this.insert(value);
+    }
   }
 
   void forEachInRange(double lo, double hi, Consumer<T> consumer) {

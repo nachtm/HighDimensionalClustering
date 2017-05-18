@@ -20,28 +20,22 @@ public class Index {
     this.trees = (RangeTree<Point>[]) Array.newInstance(RangeTree.class, ndims);
     for (int i = 0; i < ndims; i++) {
       final int j = i;
-      this.trees[i] = new RangeTree<Point>(p -> p.get(j));
+      this.trees[i] = new RangeTree<Point>(db, p -> p.get(j));
     }
   }
 
-  public Subset epsNeighborhood(Point p, double eps, Subspace subspace) {
-    Subset curr = new Subset();
-    boolean first = true;
+  public Subset epsNeighborhood(double eps, Point p, Subspace subspace, Subset subset) {
+    Subset curr = subset;
     for (Integer i : subspace) {
       final double x = p.get(i);
-      final Subset fcurr = curr;
-      if (first) {
-        first = false;
-        trees[i].forEachInRange(x - eps, x + eps, y -> fcurr.add(y));
-      } else {
-        final Subset next = new Subset();
-        trees[i].forEachInRange(x - eps, x + eps, y -> {
-          if (fcurr.contains(y)) {
-            next.add(y);
-          }
-        });
-        curr = next;
-      }
+      final Subset last = curr;
+      final Subset next = new Subset();
+      trees[i].forEachInRange(x - eps, x + eps, y -> {
+        if (last.contains(y)) {
+          next.add(y);
+        }
+      });
+      curr = next;
     }
     return curr;
   }
