@@ -31,8 +31,14 @@ public class Index {
       final Subset last = curr;
       final Subset next = new Subset();
       trees[i].forEachInRange(x - eps, x + eps, y -> {
-        if (last.contains(y)) {
-          next.add(y);
+        if (last.contains(y) && !next.contains(y)) {
+          double dsum = 0;
+          for (Integer dim : subspace) {
+            dsum += Math.pow(p.get(dim) - y.get(dim), 2);
+          }
+          if (Math.sqrt(dsum) <= eps) {
+            next.add(y);
+          }
         }
       });
       curr = next;
