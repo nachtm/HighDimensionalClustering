@@ -14,7 +14,12 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
-// task run(type: JavaExec) {
-//    main = "$arg1"
-//    classpath = sourceSets.main.runtimeClasspath
-// }
+task run(type: JavaExec) {
+    if (project.hasProperty("theClass")) {
+        classpath = sourceSets.main.runtimeClasspath
+        main = theClass
+        if (project.hasProperty("theArgs")) {
+            args Eval.me(theArgs)
+        }
+    }
+}
