@@ -2,6 +2,7 @@ package spinacht.subclu;
 
 import java.lang.*;
 import java.util.*;
+import java.util.stream.*;
 import java.util.function.*;
 
 import spinacht.dbscan.DBSCAN;
@@ -62,7 +63,9 @@ class Trie implements Clustering {
       this.children = new HashMap<>();
       Subset everything = new Subset(Trie.this.params.getDatabase());
       for (int i = 0; i < Trie.this.params.getDatabase().getDimensionality(); i++) {
-        this.children.put(i, new Node(this, i, dbscan.go(everything, new SubspaceWrapper(Arrays.asList(i)))));
+        Collection<Subset> clusters = dbscan.go(everything, new SubspaceWrapper(Arrays.asList(i)));
+        this.children.put(i, new Node(this, i, clusters));
+        // this.children.put(i, new Node(this, i, dbscan.go(everything, new SubspaceWrapper(Arrays.asList(i)))));
       }
       this.clusters = Collections.EMPTY_SET;
       this.npoints = 0;
@@ -112,12 +115,12 @@ class Trie implements Clustering {
         }
         this.children = new HashMap<>();
         for (Integer extension : candidates) {
-          path.addLast(extension);
           if (extension > this.upEdge) {
+            path.addLast(extension);
             Node bestSubspace = this;
             for (int i = 0; i < k; i++) {
-              if (marks[i].npoints < bestSubspace.npoints) {
-                bestSubspace = marks[i];
+              if (marks[i].children.get(extension).npoints < bestSubspace.npoints) {
+                bestSubspace = marks[i].children.get(extension);
               }
             }
             List<Subset> clusters = new LinkedList<>();
@@ -129,8 +132,8 @@ class Trie implements Clustering {
             if (!clusters.isEmpty()) {
               this.children.put(extension, new Node(this, extension, clusters));
             }
+            path.removeLast();
           }
-          path.removeLast();
         }
         return !this.children.isEmpty();
       } else {

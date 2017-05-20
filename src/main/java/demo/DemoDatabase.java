@@ -2,9 +2,6 @@ package demo;
 
 import java.nio.*;
 import java.nio.file.*;
-// import java.io.FileReader;
-// import java.io.IOException;
-// import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.stream.*;
 
@@ -62,11 +59,8 @@ public class DemoDatabase extends ArrayList<Point> implements Database {
   public static void main(String[] args) throws Exception {
     try {
       Database db = new DemoDatabase(Paths.get(args[0]));
-      SUBCLU.go(new Params(.05, 5, db)).forEachCluster(subspace -> {
-        System.out.print("SUBSPACE:");
-        for (Integer dim : subspace) {
-          System.out.print(" " + dim);
-        }
+      SUBCLU.go(new Params(.05, 10, db)).forEachCluster(subspace -> {
+        System.out.print("SUBSPACE: " + Subspace.pprint(subspace));
         System.out.println();
         return subset -> {
           System.out.println("  SUBSET");
