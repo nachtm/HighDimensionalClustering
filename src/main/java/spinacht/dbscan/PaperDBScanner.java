@@ -1,7 +1,6 @@
 package spinacht.dbscan;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import spinacht.common.*;
 import spinacht.data.*;
@@ -11,7 +10,7 @@ import spinacht.index.*;
  * DBSCAN as implemented by the original paper.
  * Created by nachtm on 5/15/17.
  */
-public class PaperDBScanner {
+public class PaperDBScanner implements DBSCANNER {
 
     public static final int CLUSTER_START = 0;
     public static final int UNCLASSIFIED = -1;
@@ -28,6 +27,7 @@ public class PaperDBScanner {
 
 
     //TODO: implement rangeTrees and insert here.
+    @Override
     public Collection<Subset> dbscan(Subspace space, Subset setOfPoints) {
         return clusterify(new DBScannerInstance(space, setOfPoints, eps, minPts).dbscan());
     }

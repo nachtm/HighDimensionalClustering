@@ -13,7 +13,7 @@ public interface Subspace extends Iterable<Integer> {
     return new Subspace.Simple(dims);
   }
 
-  static class Simple implements Subspace {
+  class Simple implements Subspace {
     private final Iterable<Integer> it;
     Simple(Integer[] dims) {
       this.it = Arrays.asList(dims);
@@ -23,7 +23,7 @@ public interface Subspace extends Iterable<Integer> {
     }
   }
 
-  public static String pprint(Subspace subspace) {
+  static String pprint(Subspace subspace) {
     return "{" + StreamSupport.stream(subspace.spliterator(), false).map(i -> i.toString()).collect(Collectors.joining(", ")) + "}";
   }
 
