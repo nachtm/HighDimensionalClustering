@@ -9,6 +9,8 @@ import junit.framework.TestSuite;
 import spinacht.data.*;
 import spinacht.common.Params;
 
+import demo.*;
+
 
 public class IndexTest extends TestCase {
 

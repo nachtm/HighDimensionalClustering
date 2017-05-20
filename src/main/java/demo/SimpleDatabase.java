@@ -1,4 +1,4 @@
-package spinacht.data;
+package demo;
 
 import java.io.File;
 import java.io.FileReader;
@@ -8,6 +8,8 @@ import java.util.*;
 import java.util.stream.*;
 
 import com.opencsv.CSVReader;
+
+import spinacht.data.*;
 
 
 public class SimpleDatabase extends ArrayList<Point> implements Database {
@@ -34,7 +36,7 @@ public class SimpleDatabase extends ArrayList<Point> implements Database {
 
   public SimpleDatabase(File file) throws FileNotFoundException, IOException {
     super();
-    CSVReader reader = new CSVReader(new FileReader("./src/test/resources/test.csv"));
+    CSVReader reader = new CSVReader(new FileReader(file));
     int n = -1;
     while (true) {
       String[] read = reader.readNext();
@@ -54,12 +56,5 @@ public class SimpleDatabase extends ArrayList<Point> implements Database {
   public int getDimensionality() {
     return ndims;
   }
-
-  // public static void main(String[] args) throws Exception {
-  //   Database db = new SimpleDatabase(new File("test.csv"));
-  //   for (Point pt : db) {
-  //     System.out.println(pt.get(0));
-  //   }
-  // }
 
 }

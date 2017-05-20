@@ -9,7 +9,7 @@ import spinacht.common.Params;
 
 public class SUBCLU {
 
-  static Clustering go(Params params) {
+  public static Clustering go(Params params) {
     Trie trie = new Trie(params);
     while (trie.extend());
     return trie;

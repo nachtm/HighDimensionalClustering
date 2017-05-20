@@ -7,9 +7,10 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import spinacht.data.Database;
-import spinacht.data.SimpleDatabase;
 import spinacht.data.Point;
 import spinacht.common.Params;
+
+import demo.SimpleDatabase;
 
 
 public class SUBCLUTest extends TestCase {
@@ -26,7 +27,7 @@ public class SUBCLUTest extends TestCase {
 
       try {
         Database db = new SimpleDatabase(new File(getClass().getClassLoader().getResource("test.csv").getFile()));
-        SUBCLU.go(new Params(1.1, 1, db)).forEachCluster(subspace -> {
+        SUBCLU.go(new Params(10, 1, db)).forEachCluster(subspace -> {
           System.out.print("SUBSPACE:");
           for (Integer dim : subspace) {
             System.out.print(" " + dim);
