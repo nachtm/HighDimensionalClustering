@@ -1,11 +1,8 @@
 package demo;
 
-import java.nio.*;
 import java.nio.file.*;
 import java.util.*;
 import java.util.stream.*;
-
-import com.opencsv.CSVReader;
 
 import spinacht.data.*;
 import spinacht.common.*;
@@ -31,7 +28,7 @@ public class DemoDatabase extends ArrayList<Point> implements Database {
     }
 
     public String toString() {
-      return "[" + Arrays.stream(this.point).mapToObj(x -> Double.toString(x)).collect(Collectors.joining(", ")) + "] " + this.cluster;
+      return "[" + Arrays.stream(this.point).mapToObj(Double::toString).collect(Collectors.joining(", ")) + "] " + this.cluster;
     }
 
   }
@@ -71,9 +68,6 @@ public class DemoDatabase extends ArrayList<Point> implements Database {
       });
       System.out.println();
     } catch (Exception e) {
-      e.printStackTrace(System.out);
-      throw e;
-    } catch (Error e) {
       e.printStackTrace(System.out);
       throw e;
     }

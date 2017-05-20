@@ -1,6 +1,8 @@
 ._*
 .idea/
 *.iml
+
+out/
 outfiles/
 
 .gradle
