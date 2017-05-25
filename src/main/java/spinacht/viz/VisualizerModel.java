@@ -118,6 +118,8 @@ class VisualizerModel {
         if (this.clustering == null) {
             for (Point point : this.db) {
                 mid.getGraphicsContext2D().fillRect(point.get(0), point.get(1), 4, 4);
+                top.getGraphicsContext2D().fillRect(point.get(0), 12, 4, 4);
+                left.getGraphicsContext2D().fillRect(12, point.get(1), 4,4);
             }
         } else {
             for (Map.Entry<Subspace, List<Subset>> entry : this.clustering.entrySet()) {
