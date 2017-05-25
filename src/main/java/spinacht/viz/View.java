@@ -3,6 +3,7 @@ package spinacht.viz;
 import javafx.beans.property.*;
 import javafx.geometry.Orientation;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
@@ -55,11 +56,17 @@ class View extends FlowPane {
         this.minPts = ptSpinner.valueProperty();
         FlowPane numPoints = new FlowPane(new Label("NumPoints:"), ptSpinner);
 
-        Slider epsSlider = new Slider(1, 500, 10);
+        Slider epsSlider = new Slider(1, 150, 10);
         epsSlider.setOrientation(Orientation.VERTICAL);
         this.eps = epsSlider.valueProperty();
         Canvas epsilonPreview = new Canvas(300, 300);
         FlowPane epsilonSetter = new FlowPane(epsSlider, epsilonPreview);
+
+        this.eps.addListener((IDONTCARE, oldVal, newVal) -> {
+            GraphicsContext gc = epsilonPreview.getGraphicsContext2D();
+            gc.clearRect(0, 0, 300, 300);
+            gc.fillOval(0, 0, 2*this.eps.get() + 1, 2*this.eps.get() + 1);
+        });
 
         FlowPane controls = new FlowPane(Orientation.VERTICAL, buttons, numPoints, epsilonSetter);
         controls.setVgap(10);
