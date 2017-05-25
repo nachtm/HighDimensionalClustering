@@ -29,90 +29,39 @@ public class Visualizer extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        List<Point2D.Double> points = new ArrayList<>();
+        View view = new View();
+        Model model = new Model(view);
 
-        FlowPane root = new FlowPane(Orientation.HORIZONTAL);
-
-        //build the canvases
-        GridPane canvases = new GridPane();
-
-        StackPane canvasPane = new StackPane();
-        StackPane xOnlyPane = new StackPane();
-        StackPane yOnlyPane = new StackPane();
-
-        Canvas canv = new Canvas(500, 500);
-        Canvas xOnly = new Canvas(500, 25);
-        Canvas yOnly = new Canvas(25, 500);
-
-        Pane[] panes = {canvasPane, xOnlyPane, yOnlyPane};
-        Node[] nodes = {canv, xOnly, yOnly};
-        addNodesAndStyle(panes, nodes, "bordered");
-
-        canvases.add(yOnlyPane, 0, 1);
-        canvases.add(xOnlyPane, 1, 0);
-        canvases.add(canvasPane, 1, 1);
-        root.getChildren().add(canvases);
-
-        //build the controls
-        FlowPane controls = new FlowPane(Orientation.VERTICAL);
-        controls.setVgap(10);
-
-        FlowPane buttons = new FlowPane();
-        buttons.setHgap(5);
-        Button saveButton = new Button("Save points");
-        Button goCluster = new Button("Cluster this!");
-        buttons.getChildren().add(saveButton);
-        buttons.getChildren().add(goCluster);
-
-        FlowPane numPoints = new FlowPane();
-        numPoints.getChildren().add(new Label("NumPoints:"));
-        Spinner<Integer> ptSpinner = new Spinner<>(1, Integer.MAX_VALUE, 50, 5);
-        ptSpinner.setEditable(true);
-        numPoints.getChildren().add(ptSpinner);
-
-        FlowPane epsilonSetter = new FlowPane();
-        Slider slider = new Slider();
-        slider.setOrientation(Orientation.VERTICAL);
-        epsilonSetter.getChildren().add(slider);
-        Canvas epsilonPreview = new Canvas(300, 300);
-        epsilonSetter.getChildren().add(epsilonPreview);
-
-        controls.getChildren().add(buttons);
-        controls.getChildren().add(numPoints);
-        controls.getChildren().add(epsilonSetter);
-        root.getChildren().add(controls);
-
-        Model model = new Model(new SimpleDoubleProperty(200), new SimpleIntegerProperty(2));
-
-        goCluster.setOnMouseClicked((MouseEvent e) -> {
-            model.cluster();
-            model.render(canv, xOnly, yOnly, epsilonPreview);
+        view.mid.setOnMouseClicked(e -> {
+            if (!view.isClustered.getValue()) {
+                double x = e.getX();
+                double y = e.getY();
+                // double minX = x - 2 > 0 ? x - 2 : 0;
+                // double minY = y - 2 > 0 ? y - 2 : 0;
+                model.addPoint(x, y);
+                model.render();
+            }
         });
 
-        canv.setOnMouseClicked(e -> {
-            double x = e.getX();
-            double y = e.getY();
-            double minX = x - 2 > 0 ? x - 2 : 0;
-            double minY = y - 2 > 0 ? y - 2 : 0;
-            model.addPoint(minX, minY);
-            model.render(canv, xOnly, yOnly, epsilonPreview);
+        view.isClustered.addListener((IDONTCARE, oldVal, newVal) -> {
+            if (newVal) {
+                model.cluster();
+            } else {
+                model.unCluster();
+            }
+            model.render();
         });
 
+        view.clearButton.setOnMouseClicked(e -> {
+            model.resetPoints();
+            model.render();
+        });
 
-        Scene s = new Scene(root, 1000, 600);
+        Scene s = new Scene(view, 1000, 600);
         s.getStylesheets().add("borders.css");
         primaryStage.setScene(s);
         primaryStage.show();
 
     }
 
-    private void addNodesAndStyle(Pane[] panes, Node[] nodes, String style){
-        if(panes.length != nodes.length) {
-            throw new IllegalArgumentException("Nodes and Panes must be same length");
-        }
-        for(int i = 0; i < panes.length; i++){
-            panes[i].getChildren().add(nodes[i]);
-            panes[i].getStyleClass().add(style);
-        }
-    }
 }

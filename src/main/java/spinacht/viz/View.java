@@ -1,118 +1,70 @@
 package spinacht.viz;
 
-import javafx.application.Application;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.*;
 import javafx.geometry.Orientation;
-import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Slider;
-import javafx.scene.control.Spinner;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-import javafx.stage.Stage;
 
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.List;
+class View extends FlowPane {
 
-public class View {
+    final Canvas mid;
+    final Canvas top;
+    final Canvas left;
 
-    public static final String outpath = "outfiles/points.txt";
+    final DoubleProperty eps;
+    final ReadOnlyObjectProperty<Integer> minPts;
 
-    @Override
-    public void start(Stage primaryStage) throws Exception {
+    final BooleanProperty isClustered;
+    final Button clearButton;
+    // final Button saveButton;
 
-        List<Point2D.Double> points = new ArrayList<>();
+    View() {
 
-        FlowPane root = new FlowPane(Orientation.HORIZONTAL);
+        super(Orientation.HORIZONTAL);
 
-        //build the canvases
+        this.mid = new Canvas(500, 500);
+        this.top = new Canvas(500, 25);
+        this.left = new Canvas(25, 500);
+
+        StackPane midPane = new StackPane(mid);
+        StackPane topPane = new StackPane(top);
+        StackPane leftPane = new StackPane(left);
+
+        midPane.getStyleClass().add("bordered");
+        topPane.getStyleClass().add("bordered");
+        leftPane.getStyleClass().add("bordered");
+
         GridPane canvases = new GridPane();
+        canvases.add(leftPane, 0, 1);
+        canvases.add(topPane, 1, 0);
+        canvases.add(midPane, 1, 1);
+        this.getChildren().add(canvases);
 
-        StackPane canvasPane = new StackPane();
-        StackPane xOnlyPane = new StackPane();
-        StackPane yOnlyPane = new StackPane();
-
-        Canvas canv = new Canvas(500, 500);
-        Canvas xOnly = new Canvas(500, 25);
-        Canvas yOnly = new Canvas(25, 500);
-
-        Pane[] panes = {canvasPane, xOnlyPane, yOnlyPane};
-        Node[] nodes = {canv, xOnly, yOnly};
-        addNodesAndStyle(panes, nodes, "bordered");
-
-        canvases.add(yOnlyPane, 0, 1);
-        canvases.add(xOnlyPane, 1, 0);
-        canvases.add(canvasPane, 1, 1);
-        root.getChildren().add(canvases);
-
-        //build the controls
-        FlowPane controls = new FlowPane(Orientation.VERTICAL);
-        controls.setVgap(10);
-
-        FlowPane buttons = new FlowPane();
+        // Button saveButton = new Button("Save points");
+        this.clearButton = new Button("Clear points");
+        ToggleButton clusterToggle = new ToggleButton("Cluster this!");
+        this.isClustered = clusterToggle.selectedProperty();
+        FlowPane buttons = new FlowPane(this.clearButton, clusterToggle);
         buttons.setHgap(5);
-        Button saveButton = new Button("Save points");
-        Button goCluster = new Button("Cluster this!");
-        buttons.getChildren().add(saveButton);
-        buttons.getChildren().add(goCluster);
 
-        FlowPane numPoints = new FlowPane();
-        numPoints.getChildren().add(new Label("NumPoints:"));
-        Spinner<Integer> ptSpinner = new Spinner<>(1, Integer.MAX_VALUE, 50, 5);
+        Spinner ptSpinner = new Spinner<>(1, Integer.MAX_VALUE, 5, 1);
         ptSpinner.setEditable(true);
-        numPoints.getChildren().add(ptSpinner);
+        this.minPts = ptSpinner.valueProperty();
+        FlowPane numPoints = new FlowPane(new Label("NumPoints:"), ptSpinner);
 
-        FlowPane epsilonSetter = new FlowPane();
-        Slider slider = new Slider();
-        slider.setOrientation(Orientation.VERTICAL);
-        epsilonSetter.getChildren().add(slider);
+        Slider epsSlider = new Slider(1, 500, 10);
+        epsSlider.setOrientation(Orientation.VERTICAL);
+        this.eps = epsSlider.valueProperty();
         Canvas epsilonPreview = new Canvas(300, 300);
-        epsilonSetter.getChildren().add(epsilonPreview);
+        FlowPane epsilonSetter = new FlowPane(epsSlider, epsilonPreview);
 
-        controls.getChildren().add(buttons);
-        controls.getChildren().add(numPoints);
-        controls.getChildren().add(epsilonSetter);
-        root.getChildren().add(controls);
-
-        Model model = new Model(new SimpleDoubleProperty(200), new SimpleIntegerProperty(2));
-
-        goCluster.setOnMouseClicked((MouseEvent e) -> {
-            model.cluster();
-            model.render(canv, xOnly, yOnly, epsilonPreview);
-        });
-
-        canv.setOnMouseClicked(e -> {
-            double x = e.getX();
-            double y = e.getY();
-            double minX = x - 2 > 0 ? x - 2 : 0;
-            double minY = y - 2 > 0 ? y - 2 : 0;
-            model.addPoint(minX, minY);
-            model.render(canv, xOnly, yOnly, epsilonPreview);
-        });
-
-
-        Scene s = new Scene(root, 1000, 600);
-        s.getStylesheets().add("borders.css");
-        primaryStage.setScene(s);
-        primaryStage.show();
+        FlowPane controls = new FlowPane(Orientation.VERTICAL, buttons, numPoints, epsilonSetter);
+        controls.setVgap(10);
+        this.getChildren().add(controls);
 
     }
 
-    private void addNodesAndStyle(Pane[] panes, Node[] nodes, String style){
-        if(panes.length != nodes.length) {
-            throw new IllegalArgumentException("Nodes and Panes must be same length");
-        }
-        for(int i = 0; i < panes.length; i++){
-            panes[i].getChildren().add(nodes[i]);
-            panes[i].getStyleClass().add(style);
-        }
-    }
 }
