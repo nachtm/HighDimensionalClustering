@@ -24,7 +24,7 @@ import java.util.*;
 import com.google.common.collect.Iterables;
 
 
-class VisualizerModel {
+class Model {
 
     private static class SimplePoint implements Point {
         double x, y;
@@ -58,7 +58,7 @@ class VisualizerModel {
 
     static Iterable<Color> COLORS = Iterables.cycle(Color.GREEN, Color.RED, Color.BLUE, Color.CYAN, Color.BROWN, Color.BISQUE, Color.TURQUOISE);
 
-    VisualizerModel(DoubleProperty extEps, IntegerProperty extMinPts) {
+    Model(DoubleProperty extEps, IntegerProperty extMinPts) {
         extEps.bindBidirectional(this.eps);
         extMinPts.bindBidirectional(this.minPts);
     }
