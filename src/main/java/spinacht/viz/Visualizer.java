@@ -157,7 +157,7 @@ public class Visualizer extends Application {
 
     }
 
-    private static Iterable<Color> COLORS = Iterables.cycle(Color.GREEN, Color.BLUE, Color.CYAN, Color.YELLOW, Color.PINK);
+    private static Iterable<Color> COLORS = Iterables.cycle(Color.GREEN, Color.BLUE, Color.BROWN, Color.CADETBLUE, Color.CHOCOLATE, Color.CORNFLOWERBLUE, Color.DARKCYAN, Color.DARKGREEN, Color.MEDIUMORCHID);
 
     private static double backgroundComponent(double d) {
         return d + (1 - d)/2;

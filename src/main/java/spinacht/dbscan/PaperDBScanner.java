@@ -28,7 +28,7 @@ public class PaperDBScanner implements DBSCANNER {
 
     @Override
     public Collection<Subset> dbscan(Subspace space, Subset setOfPoints) {
-        return clusterify(toBeNamedOrPutIntoTheInnerClassIJustWantedToSimplifyForTheSakeOfSeeingWhetherIHadActuallyFoundTheProblem(space, setOfPoints));
+        return clusterify(dbscanAlternate(space, setOfPoints));
     }
 
     private static Collection<Subset> clusterify(Map<Point, Integer> labels){
@@ -47,7 +47,7 @@ public class PaperDBScanner implements DBSCANNER {
         return reverse.values();
     }
 
-    private Map<Point, Integer> toBeNamedOrPutIntoTheInnerClassIJustWantedToSimplifyForTheSakeOfSeeingWhetherIHadActuallyFoundTheProblem(Subspace subspace, Subset subset) {
+    private Map<Point, Integer> dbscanAlternate(Subspace subspace, Subset subset) {
 
         Map<Point, Integer> labels = new HashMap<>();
 
@@ -68,16 +68,14 @@ public class PaperDBScanner implements DBSCANNER {
                         Subset subNeighborhood = index.epsNeighborhood(PaperDBScanner.this.eps, subSeed, subspace, subset);
                         if (subNeighborhood.size() >= PaperDBScanner.this.minPts) {
                             for (Point p : subNeighborhood) {
-                                int cid = clusterId;
-                                labels.compute(p, (k, v) -> {
-                                    if (v == null) {
-                                        reachable.offer(p);
-                                        return cid;
-                                    } else if (v == NOISE) {
-                                        return cid;
+                                if (labels.containsKey(p)) {
+                                    if (labels.get(p) == NOISE) {
+                                        labels.put(p, clusterId);
                                     }
-                                    return null;
-                                });
+                                } else {
+                                    reachable.offer(p);
+                                    labels.put(p, clusterId);
+                                }
                             }
                         }
                     }
