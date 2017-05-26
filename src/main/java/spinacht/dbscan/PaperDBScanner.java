@@ -127,34 +127,51 @@ public class PaperDBScanner implements DBSCANNER {
 
         boolean expandClusters(Point p, int clusterId){
             Subset seeds = PaperDBScanner.this.index.epsNeighborhood(eps, p, space, setOfPoints);
-            assert seeds.contains(p); //O(seeds.size())
-            if(seeds.size() < minPts){
+            Queue<Point> seedQueue = new ArrayDeque<>(seeds);
+            assert seedQueue.contains(p); //O(seeds.size())
+            if(seedQueue.size() < minPts){
                 labels.put(p, NOISE);
                 return false;
             } else {
-                changeIds(seeds, clusterId);
-                seeds.remove(p); //O(seeds.size())
-                for (Iterator<Point> it = seeds.iterator(); it.hasNext(); ) {
-                    Point currP = it.next();
-                    it.remove();
-                    Subset result = PaperDBScanner.this.index.epsNeighborhood(eps, p, space, setOfPoints);
-                    if (result.size() >= minPts) {
-                        for (Point resultP : result) {
+                changeIds(seedQueue, clusterId);
+                seedQueue.remove(p); //O(seeds.size())
+                while(!seedQueue.isEmpty()){
+                    Point currP = seedQueue.poll();
+                    Subset result = PaperDBScanner.this.index.epsNeighborhood(eps, currP, space, setOfPoints);
+                    if(result.size() >= minPts){
+                        for (Point resultP : result){
                             int resultPLabel = labels.get(resultP);
-                            if (resultPLabel == UNCLASSIFIED || resultPLabel == NOISE) {
-                                if (resultPLabel == UNCLASSIFIED) {
-                                    seeds.add(resultP);
+                            if(resultPLabel == UNCLASSIFIED || resultPLabel == NOISE){
+                                if(resultPLabel == UNCLASSIFIED){
+                                    seedQueue.add(resultP);
                                 }
                                 labels.put(resultP, clusterId);
                             }
                         }
                     }
                 }
+//                for (Iterator<Point> it = seeds.iterator(); it.hasNext(); ) {
+//                    Point currP = it.next();
+//                    it.remove();
+//                    Subset result = PaperDBScanner.this.index.epsNeighborhood(eps, currP, space, setOfPoints);
+//                    if (result.size() >= minPts) {
+//                        for (Point resultP : result) {
+//                            int resultPLabel = labels.get(resultP);
+//                            if (resultPLabel == UNCLASSIFIED || resultPLabel == NOISE) {
+//                                if (resultPLabel == UNCLASSIFIED) {
+////                                    seeds.add(resultP);
+//
+//                                }
+//                                labels.put(resultP, clusterId);
+//                            }
+//                        }
+//                    }
+//                }
                 return true;
             }
         }
 
-        void changeIds(Subset points, int toChange){
+        void changeIds(Iterable<Point> points, int toChange){
             for(Point p : points){
                 labels.put(p, toChange);
             }

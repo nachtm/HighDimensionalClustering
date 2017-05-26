@@ -16,6 +16,7 @@ import com.google.common.collect.Iterables;
 import spinacht.common.Params;
 import spinacht.data.*;
 import spinacht.subclu.DumbSUBCLU;
+import spinacht.subclu.SUBCLU;
 
 /**
  * Created by nachtm on 5/14/17.
@@ -62,7 +63,7 @@ public class Visualizer extends Application {
         if (this.view.isClustered.get()) {
             double eps = view.eps.doubleValue();
             int minPts = view.minPts.get();
-            InMemoryClustering clustering = DumbSUBCLU.go(new Params(eps, minPts, this.db)).collect();
+            InMemoryClustering clustering = SUBCLU.go(new Params(eps, minPts, this.db)).collect();
             this.renderClustering(eps, clustering);
         } else {
             this.renderPoints();
