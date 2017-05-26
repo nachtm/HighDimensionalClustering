@@ -56,7 +56,6 @@ public class PaperDBScanner implements DBSCANNER {
         for (Point seed : subset) {
             if (!labels.containsKey(seed)) {
                 Subset neighborhood = index.epsNeighborhood(PaperDBScanner.this.eps, seed, subspace, subset);
-                System.out.println(PaperDBScanner.this.minPts);
                 if (neighborhood.size() < PaperDBScanner.this.minPts) {
                     labels.put(seed, NOISE);
                 } else {
@@ -69,21 +68,22 @@ public class PaperDBScanner implements DBSCANNER {
                         Subset subNeighborhood = index.epsNeighborhood(PaperDBScanner.this.eps, subSeed, subspace, subset);
                         if (subNeighborhood.size() >= PaperDBScanner.this.minPts) {
                             for (Point p : subNeighborhood) {
-                                if (labels.containsKey(p)) {
-                                    if (labels.get(p) == NOISE) {
-                                        labels.put(p, clusterId);
+                                int cid = clusterId;
+                                labels.compute(p, (k, v) -> {
+                                    if (v == null) {
+                                        reachable.offer(p);
+                                        return cid;
+                                    } else if (v == NOISE) {
+                                        return cid;
                                     }
-                                } else {
-                                    reachable.offer(p);
-                                    labels.put(p, clusterId);
-                                }
+                                    return null;
+                                });
                             }
                         }
                     }
                     clusterId++;
                 }
             }
-
         }
 
         return labels;
