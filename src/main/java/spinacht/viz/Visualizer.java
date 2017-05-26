@@ -29,30 +29,19 @@ public class Visualizer extends Application {
     public void start(Stage primaryStage) {
 
         this.view.mid.setOnMouseClicked(e -> {
-            if (!view.isClustered.getValue()) {
-                double x = e.getX();
-                double y = e.getY();
-                this.db.add(new SimplePoint(x, y));
-                this.render();
-            }
+            double x = e.getX();
+            double y = e.getY();
+            this.db.add(new SimplePoint(x, y));
+            this.render();
         });
 
-        view.isClustered.addListener((IDONTCARE, oldVal, newVal) -> {
-            if (newVal) {
-                double eps = view.eps.doubleValue();
-                int minPts = view.minPts.get();
-                System.out.println("eps: " + eps);
-                System.out.println("minPts: " + minPts);
-                InMemoryClustering clustering = DumbSUBCLU.go(new Params(eps, minPts, this.db)).collect();
-                this.renderClustering(eps, clustering);
-            } else {
-                this.render();
-            }
-        });
+        this.view.eps.addListener(x_ -> this.render());
+        this.view.minPts.addListener(x_ -> this.render());
+
+        view.isClustered.addListener(x_ -> this.render());
 
         this.view.clearButton.setOnMouseClicked(e -> {
             this.db.clear();
-            this.view.isClustered.setValue(false);
             this.render();
         });
 
@@ -70,6 +59,17 @@ public class Visualizer extends Application {
     }
 
     private void render() {
+        if (this.view.isClustered.get()) {
+            double eps = view.eps.doubleValue();
+            int minPts = view.minPts.get();
+            InMemoryClustering clustering = DumbSUBCLU.go(new Params(eps, minPts, this.db)).collect();
+            this.renderClustering(eps, clustering);
+        } else {
+            this.renderPoints();
+        }
+    }
+
+    private void renderPoints() {
 
         clearCanvases();
 
@@ -97,27 +97,43 @@ public class Visualizer extends Application {
 
             Subspace subspace = entry.getKey();
             Iterator<Color> colors = COLORS.iterator();
+            Set<Point> notNoise = new HashSet<>();
 
             if (Iterables.elementsEqual(subspace, Subspace.of(0))) {
                 GraphicsContext gc = view.top.getGraphicsContext2D();
                 for (Subset s : entry.getValue()) {
+                    notNoise.addAll(s);
                     gc.setFill(colors.next());
                     for (Point p : s) {
+                        gc.fillOval(p.get(0) - 2, 12, 5,5);
+                    }
+                }
+                gc.setFill(Color.LIGHTGREY);
+                for (Point p : this.db) {
+                    if (!notNoise.contains(p)) {
                         gc.fillOval(p.get(0) - 2, 12, 5,5);
                     }
                 }
             } else if (Iterables.elementsEqual(subspace, Subspace.of(1))) {
                 GraphicsContext gc = view.left.getGraphicsContext2D();
                 for (Subset s : entry.getValue()) {
+                    notNoise.addAll(s);
                     gc.setFill(colors.next());
                     for (Point p : s) {
                         gc.fillOval(12, p.get(1) - 2, 5, 5);
+                    }
+                }
+                gc.setFill(Color.LIGHTGREY);
+                for (Point p : this.db) {
+                    if (!notNoise.contains(p)) {
+                        gc.fillOval(12,p.get(1) - 2,5, 5);
                     }
                 }
             } else {
                 GraphicsContext gc = this.view.mid.getGraphicsContext2D();
                 for (Subset s : entry.getValue()) {
                     gc.setFill(background(colors.next()));
+                    notNoise.addAll(s);
                     for (Point p : s) {
                         gc.fillOval(p.get(0) - eps, p.get(1) - eps, 2 * eps + 1, 2 * eps + 1);
                     }
@@ -127,6 +143,12 @@ public class Visualizer extends Application {
                     gc.setFill(colors.next());
                     for (Point p : s) {
                         gc.fillOval(p.get(0) - 2, p.get(1) - 2, 5, 5);
+                    }
+                }
+                gc.setFill(Color.LIGHTGREY);
+                for (Point p : this.db) {
+                    if (!notNoise.contains(p)) {
+                        gc.fillOval(p.get(0) - 2, p.get(1) - 2, 5,5);
                     }
                 }
             }
