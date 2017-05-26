@@ -1,9 +1,5 @@
 package spinacht.viz;
 
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import spinacht.common.Params;
@@ -24,12 +20,9 @@ class Model {
         }
         public double get(int i) {
             switch(i) {
-                case 0:
-                    return x;
-                case 1:
-                    return y;
-                default:
-                    throw new IndexOutOfBoundsException();
+                case 0: return x;
+                case 1: return y;
+                default: throw new IndexOutOfBoundsException();
             }
         }
     }
@@ -43,10 +36,16 @@ class Model {
 
     private final Database db = new SimpleDatabase();
     private Map<Subspace, Set<Subset>> clustering = null;
+    private double lastEps = -1;
+    private int lastMinPts = -1;
 
     private View view = null;
 
-    static Iterable<Color> COLORS = Iterables.cycle(Color.GREEN, Color.RED, Color.BLUE, Color.CYAN, Color.BROWN, Color.BISQUE, Color.TURQUOISE);
+    static Iterable<Color> COLORS = Iterables.cycle(Color.GREEN, Color.BLUE, Color.CYAN, Color.YELLOW, Color.PINK);
+
+    static Color background(Color c) {
+        return new Color(1 - c.getRed(), 1 - c.getGreen(), 1 - c.getBlue(), .5);
+    }
 
     Model(View view) {
         this.view = view;
@@ -65,23 +64,14 @@ class Model {
     void cluster() {
         System.out.println("eps: " + this.view.eps.doubleValue());
         System.out.println("minPts: " + this.view.minPts.get());
+        this.lastEps = this.view.eps.doubleValue();
+        this.lastMinPts = this.view.minPts.get();
+        this.clustering = DumbSUBCLU.go(new Params(this.lastEps, this.lastMinPts, this.db));
 //        this.clustering = SUBCLU.go(new Params(this.view.eps.doubleValue(), this.minPts.get(), this.db)).collect();
-        this.clustering = DumbSUBCLU.go(new Params(this.view.eps.doubleValue(), this.view.minPts.get(), this.db));
     }
 
     void unCluster() {
         this.clustering = null;
-    }
-
-    private static <T> boolean iteq(Iterable<T> a, Iterable<T> b) {
-        Iterator<T> c = a.iterator();
-        Iterator<T> d = b.iterator();
-        while (c.hasNext() && d.hasNext()) {
-            if (c.next() != d.next()) {
-                return false;
-            }
-        }
-        return c.hasNext() == d.hasNext();
     }
 
     void render() {
@@ -96,9 +86,9 @@ class Model {
             view.top.getGraphicsContext2D().setFill(Color.BLACK);
             view.left.getGraphicsContext2D().setFill(Color.BLACK);
             for (Point point : this.db) {
-                view.mid.getGraphicsContext2D().fillRect(point.get(0), point.get(1), 4, 4);
-                view.top.getGraphicsContext2D().fillRect(point.get(0), 12, 4, 4);
-                view.left.getGraphicsContext2D().fillRect(12, point.get(1), 4,4);
+                view.mid.getGraphicsContext2D().fillOval(point.get(0) - 2, point.get(1) - 2,5, 5);
+                view.top.getGraphicsContext2D().fillOval(point.get(0) - 2, 12, 5,5);
+                view.left.getGraphicsContext2D().fillOval(12, point.get(1) - 2, 5,5);
             }
 
         } else {
@@ -108,7 +98,7 @@ class Model {
                 Subspace subspace = entry.getKey();
                 Iterator<Color> colorIt = COLORS.iterator();
 
-                if (iteq(subspace, Subspace.of(0))) {
+                if (Iterables.elementsEqual(subspace, Subspace.of(0))) {
                     GraphicsContext gc = view.top.getGraphicsContext2D();
                     for (Subset s : entry.getValue()) {
                         gc.setFill(colorIt.next());
@@ -116,7 +106,7 @@ class Model {
                             gc.fillRect(p.get(0), 12, 4, 4);
                         }
                     }
-                } else if (iteq(subspace, Subspace.of(1))) {
+                } else if (Iterables.elementsEqual(subspace, Subspace.of(1))) {
                     GraphicsContext gc = view.left.getGraphicsContext2D();
                     for (Subset s : entry.getValue()) {
                         gc.setFill(colorIt.next());
@@ -127,9 +117,16 @@ class Model {
                 } else {
                     GraphicsContext gc = this.view.mid.getGraphicsContext2D();
                     for (Subset s : entry.getValue()) {
+                        gc.setFill(background(colorIt.next()));
+                        for (Point p : s) {
+                            gc.fillOval(p.get(0) - this.lastEps, p.get(1) - this.lastEps, 2*this.lastEps + 1, 2*this.lastEps + 1);
+                        }
+                    }
+                    colorIt = COLORS.iterator();
+                    for (Subset s : entry.getValue()) {
                         gc.setFill(colorIt.next());
                         for (Point p : s) {
-                            gc.fillRect(p.get(0), p.get(1), 4, 4);
+                            gc.fillRect(p.get(0) - 1, p.get(1) - 1, 4, 4);
                         }
                     }
                 }

@@ -36,8 +36,6 @@ public class Visualizer extends Application {
             if (!view.isClustered.getValue()) {
                 double x = e.getX();
                 double y = e.getY();
-                // double minX = x - 2 > 0 ? x - 2 : 0;
-                // double minY = y - 2 > 0 ? y - 2 : 0;
                 model.addPoint(x, y);
                 model.render();
             }
