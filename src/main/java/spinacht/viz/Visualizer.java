@@ -27,7 +27,7 @@ public class Visualizer extends Application {
     public static final String outpath = "outfiles/points.txt";
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
 
         View view = new View();
         Model model = new Model(view);

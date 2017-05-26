@@ -1,6 +1,5 @@
 package spinacht.viz;
 
-import javafx.application.Application;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -9,7 +8,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import spinacht.common.Params;
 import spinacht.data.*;
-import spinacht.subclu.SUBCLU;
+import spinacht.subclu.DumbSUBCLU;
 
 import java.util.*;
 import com.google.common.collect.Iterables;
@@ -68,7 +67,8 @@ class Model {
     void cluster() {
         System.out.println("eps: " + this.view.eps.doubleValue());
         System.out.println("minPts: " + this.view.minPts.get());
-        this.clustering = SUBCLU.go(new Params(this.view.eps.doubleValue(), this.minPts.get(), this.db)).collect();
+//        this.clustering = SUBCLU.go(new Params(this.view.eps.doubleValue(), this.minPts.get(), this.db)).collect();
+        this.clustering = DumbSUBCLU.go(new Params(this.view.eps.doubleValue(), this.minPts.get(), this.db));
     }
 
     void unCluster() {
