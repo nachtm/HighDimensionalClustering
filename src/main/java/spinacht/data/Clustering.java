@@ -11,6 +11,22 @@ public interface Clustering {
 
     void forEachCluster(Function<Subspace, Consumer<Subset>> f);
 
+    default InMemoryClustering collect() {
+        InMemoryClustering collected = new InMemoryClustering();
+        this.forEachCluster(subspace -> subset ->
+                collected.compute(subspace, (IDONTCARE, curr) -> {
+                    if (curr == null) {
+                        curr = new HashSet<>();
+                        curr.add(subset);
+                    } else {
+                        curr.add(subset);
+                    }
+                    return curr;
+                })
+        );
+        return collected;
+    }
+
     default void pprint() {
         this.forEachCluster(subspace -> {
             System.out.print("SUBSPACE: " + Subspace.pprint(subspace));

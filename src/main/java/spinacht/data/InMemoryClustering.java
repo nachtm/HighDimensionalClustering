@@ -16,21 +16,6 @@ public class InMemoryClustering extends HashMap<Subspace, Set<Subset>> implement
         super();
     }
 
-    public InMemoryClustering(Clustering other) {
-        super();
-        other.forEachCluster(subspace -> subset ->
-                this.compute(subspace, (IDONTCARE, curr) -> {
-                    if (curr == null) {
-                        curr = new HashSet<>();
-                        curr.add(subset);
-                    } else {
-                        curr.add(subset);
-                    }
-                    return curr;
-                })
-        );
-    }
-
     @Override
     public void forEachCluster(Function<Subspace, Consumer<Subset>> f) {
         for(Entry<Subspace, Set<Subset>> e : this.entrySet()){
@@ -39,4 +24,10 @@ public class InMemoryClustering extends HashMap<Subspace, Set<Subset>> implement
             }
         }
     }
+
+    @Override
+    public InMemoryClustering collect() {
+        return this;
+    }
+
 }

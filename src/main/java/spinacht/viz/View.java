@@ -20,7 +20,8 @@ class View extends FlowPane {
 
     final BooleanProperty isClustered;
     final Button clearButton;
-    // final Button saveButton;
+    final Button saveButton;
+    final Button loadButton;
 
     View() {
 
@@ -44,17 +45,18 @@ class View extends FlowPane {
         canvases.add(midPane, 1, 1);
         this.getChildren().add(canvases);
 
-        // Button saveButton = new Button("Save points");
-        this.clearButton = new Button("Clear points");
-        ToggleButton clusterToggle = new ToggleButton("Cluster this!");
+        ToggleButton clusterToggle = new ToggleButton("Cluster");
         this.isClustered = clusterToggle.selectedProperty();
-        FlowPane buttons = new FlowPane(this.clearButton, clusterToggle);
+        this.clearButton = new Button("Clear");
+        this.saveButton = new Button("Save");
+        this.loadButton = new Button("Load");
+        FlowPane buttons = new FlowPane(clusterToggle, this.clearButton, this.saveButton, this.loadButton);
         buttons.setHgap(5);
 
         Spinner ptSpinner = new Spinner<>(1, Integer.MAX_VALUE, 5, 1);
         ptSpinner.setEditable(true);
         this.minPts = ptSpinner.valueProperty();
-        FlowPane numPoints = new FlowPane(new Label("NumPoints:"), ptSpinner);
+        FlowPane numPoints = new FlowPane(new Label("minPts:"), ptSpinner);
 
         Slider epsSlider = new Slider(1, 150, 10);
         epsSlider.setOrientation(Orientation.VERTICAL);
@@ -71,6 +73,10 @@ class View extends FlowPane {
         FlowPane controls = new FlowPane(Orientation.VERTICAL, buttons, numPoints, epsilonSetter);
         controls.setVgap(10);
         this.getChildren().add(controls);
+
+        this.setStyle("-fx-focus-color: transparent;");
+        // this.setStyle("-fx-background-color: linear-gradient(to bottom, derive(-fx-text-box-border, -10%), -fx-text-box-border), linear-gradient(from 0px 0px to 0px 5px, derive(-fx-control-inner-background, -9%), -fx-control-inner-background);");
+        // this.setStyle("-fx-focus-color: -fx-control-inner-background ; -fx-faint-focus-color: -fx-control-inner-background ;");
 
     }
 
