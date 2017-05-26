@@ -1,5 +1,6 @@
 package spinacht.dbscan;
 
+import java.awt.print.Paper;
 import java.util.*;
 
 import spinacht.common.*;
@@ -15,9 +16,9 @@ public class PaperDBScanner implements DBSCANNER {
     public static final int CLUSTER_START = 0;
     public static final int UNCLASSIFIED = -1;
     public static final int NOISE = -2;
-    private double eps;
-    private int minPts;
-    private Index index;
+    private final double eps;
+    private final int minPts;
+    private final Index index;
 
     public PaperDBScanner(double eps, int minPts, Index index){
         this.eps = eps;
@@ -27,7 +28,7 @@ public class PaperDBScanner implements DBSCANNER {
 
     @Override
     public Collection<Subset> dbscan(Subspace space, Subset setOfPoints) {
-        return clusterify(new DBScannerInstance(space, setOfPoints, eps, minPts).dbscan());
+        return clusterify(toBeNamedOrPutIntoTheInnerClassIJustWantedToSimplifyForTheSakeOfSeeingWhetherIHadActuallyFoundTheProblem(space, setOfPoints));
     }
 
     private static Collection<Subset> clusterify(Map<Point, Integer> labels){
@@ -45,8 +46,49 @@ public class PaperDBScanner implements DBSCANNER {
                 }
             }
         }
-
         return reverse.values();
+    }
+
+    private Map<Point, Integer> toBeNamedOrPutIntoTheInnerClassIJustWantedToSimplifyForTheSakeOfSeeingWhetherIHadActuallyFoundTheProblem(Subspace subspace, Subset subset) {
+
+        Map<Point, Integer> labels = new HashMap<>();
+
+        int clusterId = 0;
+
+        for (Point seed : subset) {
+            if (!labels.containsKey(seed)) {
+                Subset neighborhood = index.epsNeighborhood(PaperDBScanner.this.eps, seed, subspace, subset);
+                if (neighborhood.size() < PaperDBScanner.this.minPts) {
+                    labels.put(seed, NOISE);
+                } else {
+                    labels.put(seed, clusterId);
+                    Queue<Point> reachable = new LinkedList<>(); // contains only points density-reachable from `point`
+                    reachable.addAll(neighborhood);
+                    while (!reachable.isEmpty()) {
+                        Point subSeed = reachable.poll();
+                        labels.put(subSeed, clusterId);
+                        Subset subNeighborhood = index.epsNeighborhood(PaperDBScanner.this.eps, subSeed, subspace, subset);
+                        if (subNeighborhood.size() >= PaperDBScanner.this.minPts) {
+                            for (Point p : subNeighborhood) {
+                                if (labels.containsKey(p)) {
+                                    if (labels.get(p) == NOISE) {
+                                        labels.put(p, clusterId);
+                                    }
+                                } else {
+                                    reachable.offer(p);
+                                    labels.put(p, clusterId);
+                                }
+                            }
+                        }
+                    }
+                    clusterId++;
+                }
+            }
+
+        }
+
+        return labels;
+
     }
 
     private class DBScannerInstance {
@@ -72,7 +114,6 @@ public class PaperDBScanner implements DBSCANNER {
             for(Point p : setOfPoints){
                 assert labels.get(p) == UNCLASSIFIED;
             }
-
             int clusterId = CLUSTER_START;
             for(Point p : setOfPoints){
                 if(labels.get(p) == UNCLASSIFIED){
@@ -80,6 +121,9 @@ public class PaperDBScanner implements DBSCANNER {
                         clusterId++;
                     }
                 }
+            }
+            for(Point p : setOfPoints){
+                assert labels.get(p) != UNCLASSIFIED;
             }
             return labels;
         }
@@ -119,4 +163,5 @@ public class PaperDBScanner implements DBSCANNER {
             }
         }
     }
+
 }
