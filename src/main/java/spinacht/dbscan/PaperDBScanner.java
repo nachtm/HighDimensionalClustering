@@ -33,17 +33,15 @@ public class PaperDBScanner implements DBSCANNER {
 
     private static Collection<Subset> clusterify(Map<Point, Integer> labels){
         Map<Integer, Subset> reverse = new HashMap<>();
-        for(Point p : labels.keySet()) {
-            Integer label = labels.get(p);
-            assert label != UNCLASSIFIED;
-            if (label != NOISE) {
-                if (reverse.containsKey(label)) {
-                    reverse.get(label).add(p);
-                } else {
-                    Subset pointList = new Subset();
-                    pointList.add(p);
-                    reverse.put(label, pointList);
-                }
+        for(Map.Entry<Point, Integer> entry : labels.entrySet()) {
+            if (entry.getValue() != NOISE) {
+                reverse.compute(entry.getValue(), (label, subset) -> {
+                    if (subset == null) {
+                        subset = new Subset();
+                    }
+                    subset.add(entry.getKey());
+                    return subset;
+                });
             }
         }
         return reverse.values();
@@ -58,6 +56,7 @@ public class PaperDBScanner implements DBSCANNER {
         for (Point seed : subset) {
             if (!labels.containsKey(seed)) {
                 Subset neighborhood = index.epsNeighborhood(PaperDBScanner.this.eps, seed, subspace, subset);
+                System.out.println(PaperDBScanner.this.minPts);
                 if (neighborhood.size() < PaperDBScanner.this.minPts) {
                     labels.put(seed, NOISE);
                 } else {
