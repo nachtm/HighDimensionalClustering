@@ -25,8 +25,6 @@ public class PaperDBScanner implements DBSCANNER {
         this.index = index;
     }
 
-
-    //TODO: implement rangeTrees and insert here.
     @Override
     public Collection<Subset> dbscan(Subspace space, Subset setOfPoints) {
         return clusterify(new DBScannerInstance(space, setOfPoints, eps, minPts).dbscan());
@@ -34,13 +32,17 @@ public class PaperDBScanner implements DBSCANNER {
 
     private static Collection<Subset> clusterify(Map<Point, Integer> labels){
         Map<Integer, Subset> reverse = new HashMap<>();
-        for(Point p : labels.keySet()){
-            if(reverse.containsKey(labels.get(p))){
-                reverse.get(labels.get(p)).add(p);
-            } else{
-                Subset pointList = new Subset();
-                pointList.add(p);
-                reverse.put(labels.get(p), pointList);
+        for(Point p : labels.keySet()) {
+            Integer label = labels.get(p);
+            assert label != UNCLASSIFIED;
+            if (label != NOISE) {
+                if (reverse.containsKey(label)) {
+                    reverse.get(label).add(p);
+                } else {
+                    Subset pointList = new Subset();
+                    pointList.add(p);
+                    reverse.put(label, pointList);
+                }
             }
         }
 
@@ -87,27 +89,28 @@ public class PaperDBScanner implements DBSCANNER {
             assert seeds.contains(p); //O(seeds.size())
             if(seeds.size() < minPts){
                 labels.put(p, NOISE);
-            } else{
+                return false;
+            } else {
                 changeIds(seeds, clusterId);
-            }
-            seeds.remove(p); //O(seeds.size())
-            for (Iterator<Point> it = seeds.iterator(); it.hasNext();) {
-                Point currP = it.next();
-                it.remove();
-                Subset result = PaperDBScanner.this.index.epsNeighborhood(eps, p, space, setOfPoints);
-                if(result.size() >= minPts){
-                    for (Point resultP : result) {
-                        int resultPLabel = labels.get(resultP);
-                        if(resultPLabel == UNCLASSIFIED || resultPLabel == NOISE){
-                            if(resultPLabel == UNCLASSIFIED){
-                                seeds.add(resultP);
+                seeds.remove(p); //O(seeds.size())
+                for (Iterator<Point> it = seeds.iterator(); it.hasNext(); ) {
+                    Point currP = it.next();
+                    it.remove();
+                    Subset result = PaperDBScanner.this.index.epsNeighborhood(eps, p, space, setOfPoints);
+                    if (result.size() >= minPts) {
+                        for (Point resultP : result) {
+                            int resultPLabel = labels.get(resultP);
+                            if (resultPLabel == UNCLASSIFIED || resultPLabel == NOISE) {
+                                if (resultPLabel == UNCLASSIFIED) {
+                                    seeds.add(resultP);
+                                }
+                                labels.put(resultP, clusterId);
                             }
-                            labels.put(resultP, clusterId);
                         }
                     }
                 }
+                return true;
             }
-            return true;
         }
 
         void changeIds(Subset points, int toChange){

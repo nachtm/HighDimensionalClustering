@@ -41,8 +41,6 @@ class Model {
         }
     }
 
-    private final DoubleProperty eps = new SimpleDoubleProperty();
-    private final IntegerProperty minPts = new SimpleIntegerProperty();
     private final Database db = new SimpleDatabase();
     private Map<Subspace, Set<Subset>> clustering = null;
 
@@ -68,7 +66,7 @@ class Model {
         System.out.println("eps: " + this.view.eps.doubleValue());
         System.out.println("minPts: " + this.view.minPts.get());
 //        this.clustering = SUBCLU.go(new Params(this.view.eps.doubleValue(), this.minPts.get(), this.db)).collect();
-        this.clustering = DumbSUBCLU.go(new Params(this.view.eps.doubleValue(), this.minPts.get(), this.db));
+        this.clustering = DumbSUBCLU.go(new Params(this.view.eps.doubleValue(), this.view.minPts.get(), this.db));
     }
 
     void unCluster() {
