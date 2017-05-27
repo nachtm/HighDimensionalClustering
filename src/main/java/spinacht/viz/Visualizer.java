@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.function.Function;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -97,63 +98,59 @@ public class Visualizer extends Application {
         for (Map.Entry<Subspace, Set<Subset>> entry : clustering.entrySet()) {
 
             Subspace subspace = entry.getKey();
-            Iterator<Color> colors = COLORS.iterator();
             Set<Point> notNoise = new HashSet<>();
+            Iterator<Color> colors = COLORS.iterator();
 
-            if (Iterables.elementsEqual(subspace, Subspace.of(0))) {
-                GraphicsContext gc = view.top.getGraphicsContext2D();
-                for (Subset s : entry.getValue()) {
-                    notNoise.addAll(s);
-                    gc.setFill(colors.next());
-                    for (Point p : s) {
-                        gc.fillOval(p.get(0) - 2, 12, 5,5);
-                    }
-                }
-                gc.setFill(Color.LIGHTGREY);
-                for (Point p : this.db) {
-                    if (!notNoise.contains(p)) {
-                        gc.fillOval(p.get(0) - 2, 12, 5,5);
-                    }
-                }
-            } else if (Iterables.elementsEqual(subspace, Subspace.of(1))) {
-                GraphicsContext gc = view.left.getGraphicsContext2D();
-                for (Subset s : entry.getValue()) {
-                    notNoise.addAll(s);
-                    gc.setFill(colors.next());
-                    for (Point p : s) {
-                        gc.fillOval(12, p.get(1) - 2, 5, 5);
-                    }
-                }
-                gc.setFill(Color.LIGHTGREY);
-                for (Point p : this.db) {
-                    if (!notNoise.contains(p)) {
-                        gc.fillOval(12,p.get(1) - 2,5, 5);
-                    }
-                }
-            } else {
-                GraphicsContext gc = this.view.mid.getGraphicsContext2D();
-                for (Subset s : entry.getValue()) {
-                    gc.setFill(background(colors.next()));
-                    notNoise.addAll(s);
-                    for (Point p : s) {
+            GraphicsContext gc = (
+                Iterables.elementsEqual(subspace, Subspace.of(0))
+                ? view.top
+                : Iterables.elementsEqual(subspace, Subspace.of(1))
+                ? view.left
+                : view.mid
+            ).getGraphicsContext2D();
+
+            for (Subset s : entry.getValue()) {
+                gc.setFill(background(colors.next()));
+                notNoise.addAll(s);
+                for (Point p : s) {
+                    if (Iterables.elementsEqual(subspace, Subspace.of(0))) {
+                        gc.fillOval(p.get(0) - eps, 8, 2 * eps + 1, 14);
+                    } else if (Iterables.elementsEqual(subspace, Subspace.of(1))) {
+                        gc.fillOval(8, p.get(1) - eps, 14, 2 * eps + 1);
+                    } else {
                         gc.fillOval(p.get(0) - eps, p.get(1) - eps, 2 * eps + 1, 2 * eps + 1);
-                    }
-                }
-                colors = COLORS.iterator();
-                for (Subset s : entry.getValue()) {
-                    gc.setFill(colors.next());
-                    for (Point p : s) {
-                        gc.fillOval(p.get(0) - 2, p.get(1) - 2, 5, 5);
-                    }
-                }
-                gc.setFill(Color.LIGHTGREY);
-                for (Point p : this.db) {
-                    if (!notNoise.contains(p)) {
-                        gc.fillOval(p.get(0) - 2, p.get(1) - 2, 5,5);
                     }
                 }
             }
 
+            colors = COLORS.iterator();
+
+            for (Subset s : entry.getValue()) {
+                gc.setFill(colors.next());
+                for (Point p : s) {
+                    if (Iterables.elementsEqual(subspace, Subspace.of(0))) {
+                        gc.fillOval(p.get(0) - 2, 12, 5,5);
+                    } else if (Iterables.elementsEqual(subspace, Subspace.of(1))) {
+                        gc.fillOval(12,p.get(1) - 2, 5,5);
+                    } else {
+                        gc.fillOval(p.get(0) - 2, p.get(1) - 2, 5, 5);
+                    }
+                }
+            }
+
+            gc.setFill(Color.LIGHTGREY);
+
+            for (Point p : this.db) {
+                if (!notNoise.contains(p)) {
+                    if (Iterables.elementsEqual(subspace, Subspace.of(0))) {
+                        gc.fillOval(p.get(0) - 2, 12, 5,5);
+                    } else if (Iterables.elementsEqual(subspace, Subspace.of(1))) {
+                        gc.fillOval(12,p.get(1) - 2, 5,5);
+                    } else {
+                        gc.fillOval(p.get(0) - 2, p.get(1) - 2, 5, 5);
+                    }
+                }
+            }
         }
 
     }

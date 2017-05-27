@@ -61,13 +61,13 @@ class View extends FlowPane {
         Slider epsSlider = new Slider(1, 150, 10);
         epsSlider.setOrientation(Orientation.VERTICAL);
         this.eps = epsSlider.valueProperty();
-        Canvas epsilonPreview = new Canvas(300, 300);
+        Canvas epsilonPreview = new Canvas(301, 301);
         FlowPane epsilonSetter = new FlowPane(epsSlider, epsilonPreview);
 
         this.eps.addListener((IDONTCARE, oldVal, newVal) -> {
             GraphicsContext gc = epsilonPreview.getGraphicsContext2D();
-            gc.clearRect(0, 0, 300, 300);
-            gc.fillOval(0, 0, 2*this.eps.get() + 1, 2*this.eps.get() + 1);
+            gc.clearRect(0, 0, 301, 301);
+            gc.fillOval(150 - this.eps.get(), 150 - this.eps.get(), 2*this.eps.get() + 1, 2*this.eps.get() + 1);
         });
 
         FlowPane controls = new FlowPane(Orientation.VERTICAL, buttons, numPoints, epsilonSetter);
