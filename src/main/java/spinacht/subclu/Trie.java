@@ -2,27 +2,26 @@ package spinacht.subclu;
 
 import java.lang.*;
 import java.util.*;
-import java.util.stream.*;
 import java.util.function.*;
 
-import spinacht.dbscan.DBSCAN;
-import spinacht.data.Cluster;
 import spinacht.data.Clustering;
 import spinacht.data.Subset;
 import spinacht.data.Subspace;
 import spinacht.data.SubspaceWrapper;
 import spinacht.common.Params;
+import spinacht.dbscan.DBSCANNER;
+import spinacht.dbscan.PaperDBScanner;
 import spinacht.index.Index;
 
 
 class Trie implements Clustering {
 
-  private final DBSCAN dbscan;
+  private final DBSCANNER dbscanner;
   private final Params params;
   private final Node root;
 
   Trie(Params params) {
-    this.dbscan = new DBSCAN(params, new Index(params.getDatabase()));
+    this.dbscanner = new PaperDBScanner(params.getEps(), params.getMinPts(), new Index(params.getDatabase()));
     this.params = params;
     this.root = new Node();
   }
@@ -30,23 +29,11 @@ class Trie implements Clustering {
   boolean extend() {
     Node[] a = new Node[this.params.getDatabase().getDimensionality()];
     return root.extend(0, a, new LinkedList<>());
-    // return root.extend(0, new Node[this.params.getDatabase().getDimensionality()], new LinkedList<>());
   }
 
   public void forEachCluster(Function<Subspace, Consumer<Subset>> f) {
     this.root.forEachCluster(f);
   }
-
-  // public Iterator<Cluster> iterator() {
-  //   return new Iterator<Cluster>() {
-  //     public boolean hasNext() {
-  //       return false;
-  //     }
-  //     public Cluster next() {
-  //       return null;
-  //     }
-  //   };
-  // }
 
   private class Node implements Subspace, Clustering {
 
@@ -63,7 +50,7 @@ class Trie implements Clustering {
       this.children = new HashMap<>();
       Subset everything = new Subset(Trie.this.params.getDatabase());
       for (int i = 0; i < Trie.this.params.getDatabase().getDimensionality(); i++) {
-        Collection<Subset> clusters = dbscan.go(everything, new SubspaceWrapper(Arrays.asList(i)));
+        Collection<Subset> clusters = dbscanner.dbscan(new SubspaceWrapper(Arrays.asList(i)), everything);
         this.children.put(i, new Node(this, i, clusters));
         // this.children.put(i, new Node(this, i, dbscan.go(everything, new SubspaceWrapper(Arrays.asList(i)))));
       }
@@ -125,9 +112,7 @@ class Trie implements Clustering {
             }
             List<Subset> clusters = new LinkedList<>();
             for (Subset cluster : bestSubspace.clusters) {
-              for (Subset c : dbscan.go(cluster, new SubspaceWrapper(path))) {
-                clusters.add(c);
-              }
+              clusters.addAll(dbscanner.dbscan(new SubspaceWrapper(path), cluster));
             }
             if (!clusters.isEmpty()) {
               this.children.put(extension, new Node(this, extension, clusters));
