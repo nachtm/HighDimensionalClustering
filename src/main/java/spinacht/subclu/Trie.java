@@ -27,8 +27,8 @@ class Trie implements Clustering {
   }
 
   boolean extend() {
-    Node[] a = new Node[this.params.getDatabase().getDimensionality()];
-    return root.extend(0, a, new LinkedList<>());
+    Node[] marks = new Node[this.params.getDatabase().getDimensionality()];
+    return root.extend(0, marks, new LinkedList<>());
   }
 
   public void forEachCluster(Function<Subspace, Consumer<Subset>> f) {
@@ -52,7 +52,6 @@ class Trie implements Clustering {
       for (int i = 0; i < Trie.this.params.getDatabase().getDimensionality(); i++) {
         Collection<Subset> clusters = dbscanner.dbscan(new SubspaceWrapper(Arrays.asList(i)), everything);
         this.children.put(i, new Node(this, i, clusters));
-        // this.children.put(i, new Node(this, i, dbscan.go(everything, new SubspaceWrapper(Arrays.asList(i)))));
       }
       this.clusters = Collections.EMPTY_SET;
       this.npoints = 0;

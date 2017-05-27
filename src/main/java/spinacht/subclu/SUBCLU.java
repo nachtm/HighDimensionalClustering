@@ -1,8 +1,5 @@
 package spinacht.subclu;
 
-import java.lang.Iterable;
-
-import spinacht.subclu.Trie;
 import spinacht.data.Clustering;
 import spinacht.common.Params;
 
