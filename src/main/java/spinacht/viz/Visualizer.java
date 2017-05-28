@@ -8,6 +8,7 @@ import java.util.function.Function;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
 import javafx.stage.Stage;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -92,35 +93,52 @@ public class Visualizer extends Application {
 
     }
 
+    private Canvas getCanvasOf(Subspace subspace) {
+        return Iterables.elementsEqual(subspace, Subspace.of(0))
+             ? view.top
+             : Iterables.elementsEqual(subspace, Subspace.of(1))
+             ? view.left
+             : view.mid
+             ;
+    }
+
+    private void drawPointIn(Point p, Subspace subspace) {
+        if (Iterables.elementsEqual(subspace, Subspace.of(0))) {
+            view.top.getGraphicsContext2D().fillOval(p.get(0) - 2, 11, 5,5);
+        } else if (Iterables.elementsEqual(subspace, Subspace.of(1))) {
+            view.left.getGraphicsContext2D().fillOval(11,p.get(1) - 2, 5,5);
+        } else {
+            view.mid.getGraphicsContext2D().fillOval(p.get(0) - 2, p.get(1) - 2, 5, 5);
+        }
+    }
+
+    private void drawRegionIn(Point p, double eps, Subspace subspace) {
+        if (Iterables.elementsEqual(subspace, Subspace.of(0))) {
+            view.top.getGraphicsContext2D().fillOval(p.get(0) - eps, 6, 2 * eps + 1, 14);
+        } else if (Iterables.elementsEqual(subspace, Subspace.of(1))) {
+            view.left.getGraphicsContext2D().fillOval(6, p.get(1) - eps, 14, 2 * eps + 1);
+        } else {
+            view.mid.getGraphicsContext2D().fillOval(p.get(0) - eps, p.get(1) - eps, 2 * eps + 1, 2 * eps + 1);
+        }
+    }
+
     private void renderClustering(double eps, InMemoryClustering clustering) {
 
         clearCanvases();
 
         for (Map.Entry<Subspace, Set<Subset>> entry : clustering.entrySet()) {
 
-            Subspace subspace = entry.getKey();
-            Set<Point> notNoise = new HashSet<>();
-            Iterator<Color> colors = COLORS.iterator();
+            final Subspace subspace = entry.getKey();
+            final GraphicsContext gc = getCanvasOf(subspace).getGraphicsContext2D();
+            final Set<Point> notNoise = new HashSet<>();
 
-            GraphicsContext gc = (
-                Iterables.elementsEqual(subspace, Subspace.of(0))
-                ? view.top
-                : Iterables.elementsEqual(subspace, Subspace.of(1))
-                ? view.left
-                : view.mid
-            ).getGraphicsContext2D();
+            Iterator<Color> colors = COLORS.iterator();
 
             for (Subset s : entry.getValue()) {
                 gc.setFill(background(colors.next()));
                 notNoise.addAll(s);
                 for (Point p : s) {
-                    if (Iterables.elementsEqual(subspace, Subspace.of(0))) {
-                        gc.fillOval(p.get(0) - eps, 6, 2 * eps + 1, 14);
-                    } else if (Iterables.elementsEqual(subspace, Subspace.of(1))) {
-                        gc.fillOval(6, p.get(1) - eps, 14, 2 * eps + 1);
-                    } else {
-                        gc.fillOval(p.get(0) - eps, p.get(1) - eps, 2 * eps + 1, 2 * eps + 1);
-                    }
+                    drawRegionIn(p, eps, subspace);
                 }
             }
 
@@ -129,13 +147,7 @@ public class Visualizer extends Application {
             for (Subset s : entry.getValue()) {
                 gc.setFill(colors.next());
                 for (Point p : s) {
-                    if (Iterables.elementsEqual(subspace, Subspace.of(0))) {
-                        gc.fillOval(p.get(0) - 2, 11, 5,5);
-                    } else if (Iterables.elementsEqual(subspace, Subspace.of(1))) {
-                        gc.fillOval(11,p.get(1) - 2, 5,5);
-                    } else {
-                        gc.fillOval(p.get(0) - 2, p.get(1) - 2, 5, 5);
-                    }
+                    drawPointIn(p, subspace);
                 }
             }
 
@@ -143,15 +155,10 @@ public class Visualizer extends Application {
 
             for (Point p : this.db) {
                 if (!notNoise.contains(p)) {
-                    if (Iterables.elementsEqual(subspace, Subspace.of(0))) {
-                        gc.fillOval(p.get(0) - 2, 11, 5,5);
-                    } else if (Iterables.elementsEqual(subspace, Subspace.of(1))) {
-                        gc.fillOval(11,p.get(1) - 2, 5,5);
-                    } else {
-                        gc.fillOval(p.get(0) - 2, p.get(1) - 2, 5, 5);
-                    }
+                    drawPointIn(p, subspace);
                 }
             }
+
         }
 
     }
