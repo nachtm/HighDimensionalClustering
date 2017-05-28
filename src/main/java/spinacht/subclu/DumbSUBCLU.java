@@ -1,17 +1,14 @@
 package spinacht.subclu;
 
-import spinacht.common.Params;
-import spinacht.data.Clustering;
-import spinacht.data.InMemoryClustering;
-import spinacht.data.Subset;
-import spinacht.data.Subspace;
+import spinacht.Params;
+import spinacht.data.*;
 import spinacht.dbscan.DBSCANNER;
 import spinacht.dbscan.PaperDBScanner;
 import spinacht.index.Index;
 
 import java.util.HashSet;
-import java.util.Set;
-import java.util.function.BiFunction;
+import java.util.LinkedList;
+import java.util.function.Consumer;
 
 /**
  * Created by nachtm on 5/25/17.
@@ -19,21 +16,34 @@ import java.util.function.BiFunction;
 public class DumbSUBCLU {
 
     public static InMemoryClustering go(Params params){
-
         Index index = new Index(params.getDatabase());
-
-        DBSCANNER ds = new PaperDBScanner(params.getEps(), params.getMinPts(), index);
-
+        DBSCANNER dbscanner = new PaperDBScanner(params.getEps(), params.getMinPts(), index);
         Subset everything = new Subset(params.getDatabase());
-
-        //assume 2d database
-        InMemoryClustering result = new InMemoryClustering();
-
-        BiFunction<Subspace, Set<Subset>, Set<Subset>> addToMap = (subspace, subset) -> new HashSet<>(ds.dbscan(subspace, everything));
-        result.compute(Subspace.of(0),   addToMap);
-        result.compute(Subspace.of(1),   addToMap);
-        result.compute(Subspace.of(0,1), addToMap);
-
-        return result;
+        InMemoryClustering clustering = new InMemoryClustering();
+        forEachSubspace(params.getDatabase().getDimensionality(), xs -> {
+            clustering.put(new SubspaceWrapper(xs.descendingIterator()), new HashSet<>(dbscanner.dbscan(new SubspaceWrapper(xs), everything)));
+        });
+        return clustering;
     }
+
+    private static void forEachSubspace(int ndims, Consumer<LinkedList<Integer>> consumer) {
+        LinkedList<Integer> xs = new LinkedList<>();
+        forEachPrefix(ndims, xs, () -> {
+            if (!xs.isEmpty()) {
+                consumer.accept(xs);
+            }
+        });
+    }
+
+    private static void forEachPrefix(int x, LinkedList<Integer> xs, Runnable go) {
+        if (x == 0) {
+            go.run();
+        } else {
+            xs.addFirst(x - 1);
+            forEachPrefix(x - 1, xs, go);
+            xs.removeFirst();
+            forEachPrefix(x - 1, xs, go);
+        }
+    }
+
 }

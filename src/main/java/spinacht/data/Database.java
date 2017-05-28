@@ -5,6 +5,6 @@ import java.util.Collection;
 
 public interface Database extends Collection<Point> {
 
-  public int getDimensionality();
+    public int getDimensionality();
 
 }

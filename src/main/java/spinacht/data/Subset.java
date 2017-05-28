@@ -1,17 +1,16 @@
 package spinacht.data;
 
-import java.util.HashSet;
 import java.util.Collection;
-import java.util.stream.Collectors;
+import java.util.HashSet;
 
 
 public class Subset extends HashSet<Point> {
 
-  public Subset() {
+    public Subset() {
     super();
   }
 
-  public Subset(Collection<Point> c) {
+    public Subset(Collection<Point> c) {
     super(c);
   }
 

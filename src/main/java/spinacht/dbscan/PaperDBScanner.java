@@ -1,11 +1,11 @@
 package spinacht.dbscan;
 
-import java.awt.print.Paper;
-import java.util.*;
+import spinacht.data.Point;
+import spinacht.data.Subset;
+import spinacht.data.Subspace;
+import spinacht.index.Index;
 
-import spinacht.common.*;
-import spinacht.data.*;
-import spinacht.index.*;
+import java.util.*;
 
 /**
  * DBSCAN as implemented by the original paper.
@@ -16,9 +16,9 @@ public class PaperDBScanner implements DBSCANNER {
     public static final int CLUSTER_START = 0;
     public static final int UNCLASSIFIED = -1;
     public static final int NOISE = -2;
-    private double eps;
-    private int minPts;
-    private Index index;
+    private final double eps;
+    private final int minPts;
+    private final Index index;
 
     public PaperDBScanner(double eps, int minPts, Index index){
         this.eps = eps;
@@ -28,25 +28,22 @@ public class PaperDBScanner implements DBSCANNER {
 
     @Override
     public Collection<Subset> dbscan(Subspace space, Subset setOfPoints) {
-        return clusterify(new DBScannerInstance(space, setOfPoints, eps, minPts).dbscan());
+        return clusterify((new DBScannerInstance(space, setOfPoints, PaperDBScanner.this.eps, PaperDBScanner.this.minPts)).dbscan());
     }
 
     private static Collection<Subset> clusterify(Map<Point, Integer> labels){
         Map<Integer, Subset> reverse = new HashMap<>();
-        for(Point p : labels.keySet()) {
-            Integer label = labels.get(p);
-            assert label != UNCLASSIFIED;
-            if (label != NOISE) {
-                if (reverse.containsKey(label)) {
-                    reverse.get(label).add(p);
-                } else {
-                    Subset pointList = new Subset();
-                    pointList.add(p);
-                    reverse.put(label, pointList);
-                }
+        for(Map.Entry<Point, Integer> entry : labels.entrySet()) {
+            if (entry.getValue() != NOISE) {
+                reverse.compute(entry.getValue(), (label, subset) -> {
+                    if (subset == null) {
+                        subset = new Subset();
+                    }
+                    subset.add(entry.getKey());
+                    return subset;
+                });
             }
         }
-
         return reverse.values();
     }
 
@@ -73,7 +70,6 @@ public class PaperDBScanner implements DBSCANNER {
             for(Point p : setOfPoints){
                 assert labels.get(p) == UNCLASSIFIED;
             }
-
             int clusterId = CLUSTER_START;
             for(Point p : setOfPoints){
                 if(labels.get(p) == UNCLASSIFIED){
@@ -81,6 +77,9 @@ public class PaperDBScanner implements DBSCANNER {
                         clusterId++;
                     }
                 }
+            }
+            for(Point p : setOfPoints){
+                assert labels.get(p) != UNCLASSIFIED;
             }
             return labels;
         }
@@ -120,4 +119,5 @@ public class PaperDBScanner implements DBSCANNER {
             }
         }
     }
+
 }

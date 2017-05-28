@@ -1,15 +1,15 @@
 package spinacht.index;
 
-import java.io.File;
-
+import demo.SimpleDatabase;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+import spinacht.data.Database;
+import spinacht.data.Point;
+import spinacht.data.Subset;
+import spinacht.data.Subspace;
 
-import spinacht.data.*;
-import spinacht.common.Params;
-
-import demo.*;
+import java.io.File;
 
 
 public class IndexTest extends TestCase {

@@ -1,77 +1,118 @@
 package spinacht.viz;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.HashSet;
-
+import com.google.common.collect.Iterables;
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.stage.Stage;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-
-import com.google.common.collect.Iterables;
-
-import spinacht.common.Params;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import spinacht.Params;
 import spinacht.data.*;
 import spinacht.subclu.DumbSUBCLU;
-import spinacht.subclu.SUBCLU;
+
+import java.io.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Created by nachtm on 5/14/17.
  */
 public class Visualizer extends Application {
 
-    private final Database db = new SimpleDatabase();
+    private SimpleDatabase db = new SimpleDatabase();
     private View view = new View();
 
     @Override
     public void start(Stage primaryStage) {
 
         this.view.mid.setOnMouseClicked(e -> {
-            if (!view.isClustered.getValue()) {
-                double x = e.getX();
-                double y = e.getY();
-                this.db.add(new SimplePoint(x, y));
-                this.render();
-            }
-        });
-
-        view.isClustered.addListener((IDONTCARE, oldVal, newVal) -> {
-            if (newVal) {
-                double eps = view.eps.doubleValue();
-                int minPts = view.minPts.get();
-                System.out.println("eps: " + eps);
-                System.out.println("minPts: " + minPts);
-//                InMemoryClustering clustering = DumbSUBCLU.go(new Params(eps, minPts, this.db)).collect();
-                InMemoryClustering clustering = SUBCLU.go(new Params(eps, minPts, this.db)).collect();
-                this.renderClustering(eps, clustering);
-            } else {
-                this.render();
-            }
-        });
-
-        this.view.clearButton.setOnMouseClicked(e -> {
-            this.db.clear();
-            this.view.isClustered.setValue(false);
+            double x = e.getX();
+            double y = e.getY();
+            this.db.add(new SimplePoint(x, y));
             this.render();
         });
 
-        Scene s = new Scene(this.view, 1000, 600);
-        s.getStylesheets().add("borders.css");
-        primaryStage.setScene(s);
+        this.view.eps.addListener(x_ -> this.render());
+        this.view.minPts.addListener(x_ -> this.render());
+
+        view.isClustered.addListener(x_ -> this.render());
+
+        this.view.clearButton.setOnMouseClicked(x_ -> {
+            this.view.isClustered.set(false);
+            this.db.clear();
+            this.render();
+        });
+
+        this.view.saveButton.setOnMouseClicked(x_ -> {
+            FileChooser chooser = new FileChooser();
+            chooser.setTitle("Save Points");
+            chooser.setInitialFileName("WHEREISTHIS");
+            File file = chooser.showOpenDialog(primaryStage);
+            if (file != null) {
+                try {
+                    this.db.toFile(file);
+                } catch (IOException e) {
+                    System.out.println(e);
+                }
+            }
+        });
+
+        this.view.loadButton.setOnMouseClicked(x_ -> {
+            FileChooser chooser = new FileChooser();
+            chooser.setTitle("Load Points");
+            File file = chooser.showOpenDialog(primaryStage);
+            if (file != null) {
+                try {
+                    this.db = fromFile(file);
+                    this.render();
+                } catch (IOException e) {
+                    System.out.println(e);
+                }
+            }
+        });
+
+        this.render();
+
+        Scene scene = new Scene(this.view);
+        primaryStage.setScene(scene);
         primaryStage.show();
+        scene.getStylesheets().add(Visualizer.class.getResource("main.css").toExternalForm());
 
     }
 
     private void clearCanvases() {
+
+        view.mid.getGraphicsContext2D().setFill(Color.WHITE);
+        view.top.getGraphicsContext2D().setFill(Color.WHITE);
+        view.left.getGraphicsContext2D().setFill(Color.WHITE);
+
         view.mid.getGraphicsContext2D().clearRect(0,0,500,500);
+        view.mid.getGraphicsContext2D().fillRect(0,0,500,500);
+
         view.top.getGraphicsContext2D().clearRect(0,0,500,25);
+        view.top.getGraphicsContext2D().fillRect(0,0,500,25);
+
         view.left.getGraphicsContext2D().clearRect(0,0,25,500);
+        view.left.getGraphicsContext2D().fillRect(0,0,25,500);
+
     }
 
     private void render() {
+        if (this.view.isClustered.get()) {
+            double eps = view.eps.doubleValue();
+            int minPts = view.minPts.get();
+            InMemoryClustering clustering = DumbSUBCLU.go(new Params(eps, minPts, this.db)).collect();
+            this.renderClustering(eps, clustering);
+        } else {
+            this.renderPoints();
+        }
+    }
+
+    private void renderPoints() {
 
         clearCanvases();
 
@@ -85,51 +126,80 @@ public class Visualizer extends Application {
 
         for (Point point : this.db) {
             mid.fillOval(point.get(0) - 2, point.get(1) - 2, 5, 5);
-            top.fillOval(point.get(0) - 2, 12, 5, 5);
-            left.fillOval(12, point.get(1) - 2, 5, 5);
+            top.fillOval(point.get(0) - 2, 11, 5, 5);
+            left.fillOval(11, point.get(1) - 2, 5, 5);
         }
 
+    }
+
+    private boolean subspaceIs(Subspace subspace, Integer... cmp) {
+        return Iterables.elementsEqual(subspace, Arrays.asList(cmp));
+    }
+
+    private Canvas getCanvasOf(Subspace subspace) {
+        return subspaceIs(subspace, 0) ? view.top : subspaceIs(subspace, 1) ? view.left : view.mid;
+    }
+
+    private void drawPointIn(Point p, Subspace subspace) {
+        if (subspaceIs(subspace, 0)) {
+            view.top.getGraphicsContext2D().fillOval(p.get(0) - 2, 11, 5, 5);
+        } else if (subspaceIs(subspace, 1)) {
+            view.left.getGraphicsContext2D().fillOval(11,p.get(1) - 2, 5,5);
+        } else {
+            view.mid.getGraphicsContext2D().fillOval(p.get(0) - 2, p.get(1) - 2, 5, 5);
+        }
+    }
+
+    private void drawRegionIn(Point p, double eps, Subspace subspace) {
+        if (subspaceIs(subspace, 0)) {
+            view.top.getGraphicsContext2D().fillOval(p.get(0) - eps, 6, 2 * eps + 1, 14);
+        } else if (subspaceIs(subspace,1)) {
+            view.left.getGraphicsContext2D().fillOval(6, p.get(1) - eps, 14, 2 * eps + 1);
+        } else {
+            view.mid.getGraphicsContext2D().fillOval(p.get(0) - eps, p.get(1) - eps, 2 * eps + 1, 2 * eps + 1);
+        }
     }
 
     private void renderClustering(double eps, InMemoryClustering clustering) {
 
         clearCanvases();
 
-        for (Map.Entry<Subspace, Set<Subset>> entry : clustering.entrySet()) {
+        Iterable<TransparentSubspace> subspaces = Arrays.asList(
+            new SubspaceWrapper(0),
+            new SubspaceWrapper(1),
+            new SubspaceWrapper(1, 0)
+        );
 
-            Subspace subspace = entry.getKey();
+        for (TransparentSubspace subspace : subspaces) {
+
+            final Set<Subset> subsets = clustering.getOrDefault(subspace, new HashSet<>());
+            final GraphicsContext gc = getCanvasOf(subspace).getGraphicsContext2D();
+            final Set<Point> notNoise = new HashSet<>();
+
             Iterator<Color> colors = COLORS.iterator();
 
-            if (Iterables.elementsEqual(subspace, Subspace.of(0))) {
-                GraphicsContext gc = view.top.getGraphicsContext2D();
-                for (Subset s : entry.getValue()) {
-                    gc.setFill(colors.next());
-                    for (Point p : s) {
-                        gc.fillOval(p.get(0) - 2, 12, 5,5);
-                    }
+            for (Subset s : subsets) {
+                gc.setFill(background(colors.next()));
+                notNoise.addAll(s);
+                for (Point p : s) {
+                    drawRegionIn(p, eps, subspace);
                 }
-            } else if (Iterables.elementsEqual(subspace, Subspace.of(1))) {
-                GraphicsContext gc = view.left.getGraphicsContext2D();
-                for (Subset s : entry.getValue()) {
-                    gc.setFill(colors.next());
-                    for (Point p : s) {
-                        gc.fillOval(12, p.get(1) - 2, 5, 5);
-                    }
+            }
+
+            colors = COLORS.iterator();
+
+            for (Subset s : subsets) {
+                gc.setFill(colors.next());
+                for (Point p : s) {
+                    drawPointIn(p, subspace);
                 }
-            } else {
-                GraphicsContext gc = this.view.mid.getGraphicsContext2D();
-                for (Subset s : entry.getValue()) {
-                    gc.setFill(background(colors.next()));
-                    for (Point p : s) {
-                        gc.fillOval(p.get(0) - eps, p.get(1) - eps, 2 * eps + 1, 2 * eps + 1);
-                    }
-                }
-                colors = COLORS.iterator();
-                for (Subset s : entry.getValue()) {
-                    gc.setFill(colors.next());
-                    for (Point p : s) {
-                        gc.fillOval(p.get(0) - 2, p.get(1) - 2, 5, 5);
-                    }
+            }
+
+            gc.setFill(Color.LIGHTGREY);
+
+            for (Point p : this.db) {
+                if (!notNoise.contains(p)) {
+                    drawPointIn(p, subspace);
                 }
             }
 
@@ -137,7 +207,7 @@ public class Visualizer extends Application {
 
     }
 
-    private static Iterable<Color> COLORS = Iterables.cycle(Color.GREEN, Color.BLUE, Color.CYAN, Color.YELLOW, Color.PINK);
+    private static Iterable<Color> COLORS = Iterables.cycle(Color.GREEN, Color.BLUE, Color.BROWN, Color.CADETBLUE, Color.CHOCOLATE, Color.CORNFLOWERBLUE, Color.DARKCYAN, Color.DARKGREEN, Color.MEDIUMORCHID);
 
     private static double backgroundComponent(double d) {
         return d + (1 - d)/2;
@@ -167,11 +237,33 @@ public class Visualizer extends Application {
         }
     }
 
-    private class SimpleDatabase extends HashSet<Point> implements Database  {
+    static class SimpleDatabase extends HashSet<Point> implements Database  {
+
         @Override
         public int getDimensionality() {
             return 2;
         }
+
+        void toFile(File file) throws IOException {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            for (Point p : this) {
+                writer.write(p.get(0) + " " + p.get(1));
+                writer.newLine();
+            }
+            writer.flush();
+            writer.close();
+        }
+
+    }
+
+    static SimpleDatabase fromFile(File file) throws IOException {
+        SimpleDatabase db = new SimpleDatabase();
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+        reader.lines().map(line -> line.trim().split("\\s+")).forEach(row -> {
+            db.add(new SimplePoint(Double.parseDouble(row[0]), Double.parseDouble(row[1])));
+        });
+        reader.close();
+        return db;
     }
 
 }
