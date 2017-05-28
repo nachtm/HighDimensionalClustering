@@ -1,7 +1,6 @@
 package spinacht.viz;
 
 import java.util.*;
-import java.util.function.Function;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -14,7 +13,6 @@ import com.google.common.collect.Iterables;
 
 import spinacht.common.Params;
 import spinacht.data.*;
-import spinacht.subclu.DumbSUBCLU;
 import spinacht.subclu.SUBCLU;
 
 /**
@@ -46,17 +44,30 @@ public class Visualizer extends Application {
             this.render();
         });
 
-        Scene s = new Scene(this.view, 1000, 600);
-        s.getStylesheets().add("borders.css");
-        primaryStage.setScene(s);
+        this.render();
+
+        Scene scene = new Scene(this.view);
+        primaryStage.setScene(scene);
         primaryStage.show();
+        scene.getStylesheets().add(Visualizer.class.getResource("main.css").toExternalForm());
 
     }
 
     private void clearCanvases() {
+
+        view.mid.getGraphicsContext2D().setFill(Color.WHITE);
+        view.top.getGraphicsContext2D().setFill(Color.WHITE);
+        view.left.getGraphicsContext2D().setFill(Color.WHITE);
+
         view.mid.getGraphicsContext2D().clearRect(0,0,500,500);
+        view.mid.getGraphicsContext2D().fillRect(0,0,500,500);
+
         view.top.getGraphicsContext2D().clearRect(0,0,500,25);
+        view.top.getGraphicsContext2D().fillRect(0,0,500,25);
+
         view.left.getGraphicsContext2D().clearRect(0,0,25,500);
+        view.left.getGraphicsContext2D().fillRect(0,0,25,500);
+
     }
 
     private void render() {

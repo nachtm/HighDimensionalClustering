@@ -25,7 +25,9 @@ class View extends HBox {
 
     View() {
 
-        super();
+        super(10);
+
+        this.setId("root");
 
         this.setPadding(new Insets(10, 10, 10, 10));
 
@@ -37,14 +39,11 @@ class View extends HBox {
         StackPane topPane = new StackPane(top);
         StackPane leftPane = new StackPane(left);
 
-        midPane.getStyleClass().add("bordered");
-        topPane.getStyleClass().add("bordered");
-        leftPane.getStyleClass().add("bordered");
-
         GridPane canvases = new GridPane();
         canvases.add(leftPane, 0,0);
         canvases.add(topPane, 1, 1);
         canvases.add(midPane, 1, 0);
+        canvases.setGridLinesVisible(true);
         this.getChildren().add(canvases);
 
         ToggleButton clusterToggle = new ToggleButton("Cluster");
@@ -59,24 +58,24 @@ class View extends HBox {
         this.minPts = minPtsSpinner.valueProperty();
         FlowPane minPtsInput = new FlowPane(10, 10, new Label("minPts:"), minPtsSpinner);
 
-        Slider epsSlider = new Slider(1, 120, 10);
+        int epsMax = 150;
+        Slider epsSlider = new Slider(1, epsMax, 10);
         epsSlider.setOrientation(Orientation.HORIZONTAL);
-        epsSlider.setMinWidth(203);
+        epsSlider.setMinWidth(2*epsMax + 1);
+        epsSlider.setMaxWidth(2*epsMax + 1);
         this.eps = epsSlider.valueProperty();
-        FlowPane epsInput = new FlowPane(5, 5, new Label("eps:"), epsSlider);
 
-        Canvas epsPreview = new Canvas(241, 241);
+        Canvas epsPreview = new Canvas(2*epsMax + 1, 2*epsMax + 1);
 
         this.eps.addListener((x_, oldVal, newVal) -> {
             GraphicsContext gc = epsPreview.getGraphicsContext2D();
-            gc.clearRect(0, 0, 241, 241);
-            gc.fillOval(120 - this.eps.get(), 120 - this.eps.get(), 2*this.eps.get() + 1, 2*this.eps.get() + 1);
+            gc.clearRect(0, 0, 2*epsMax + 1, 2*epsMax + 1);
+            gc.fillOval(epsMax - this.eps.get(), epsMax - this.eps.get(), 2*this.eps.get() + 1, 2*this.eps.get() + 1);
         });
 
         this.eps.setValue(30);
 
-        VBox controls = new VBox(10, buttons, minPtsInput, epsInput, epsPreview);
-        controls.setPadding(new Insets(10, 10, 10, 10));
+        VBox controls = new VBox(10, buttons, minPtsInput, epsSlider, epsPreview);
         this.getChildren().add(controls);
 
         // this.setStyle("-fx-focus-color: transparent;");
