@@ -13,7 +13,7 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 
-public class SimpleDatabase extends ArrayList<Point> implements Database {
+public class SimpleDatabase extends ArrayList<Point> implements Database<Point> {
 
   private final int ndims;
 

@@ -3,6 +3,6 @@ package spinacht.data;
 
 public interface Point {
 
-    public double get(int i);
+    double get(int i);
 
 }

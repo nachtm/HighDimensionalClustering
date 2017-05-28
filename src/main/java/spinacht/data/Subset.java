@@ -11,7 +11,7 @@ public class Subset extends HashSet<Point> {
   }
 
     public Subset(Collection<Point> c) {
-    super(c);
-  }
+        super(c);
+    }
 
 }

@@ -17,13 +17,15 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Created by nachtm on 5/14/17.
  */
 public class Visualizer extends Application {
 
-    private SimpleDatabase db = new SimpleDatabase();
+    private Database<Point> db = new SimpleDatabase(2);
     private View view = new View();
 
     @Override
@@ -32,7 +34,7 @@ public class Visualizer extends Application {
         this.view.mid.setOnMouseClicked(e -> {
             double x = e.getX();
             double y = e.getY();
-            this.db.add(new SimplePoint(x, y));
+            this.db.add(new SimpleDatabase.SimplePoint(x, y));
             this.render();
         });
 
@@ -54,7 +56,7 @@ public class Visualizer extends Application {
             File file = chooser.showOpenDialog(primaryStage);
             if (file != null) {
                 try {
-                    this.db.toFile(file);
+                    toFile(file, this.db);
                 } catch (IOException e) {
                     System.out.println(e);
                 }
@@ -222,46 +224,23 @@ public class Visualizer extends Application {
         );
     }
 
-    private static class SimplePoint implements Point {
-        double x, y;
-        SimplePoint(double x, double y) {
-            this.x = x;
-            this.y = y;
+    static void toFile(File file, Database<Point> db) throws IOException {
+        BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+        for (Point p : db) {
+            writer.write(IntStream.range(0, db.getDimensionality()).boxed().map(i -> Double.toString(p.get(i))).collect(Collectors.joining(" ")));
+            writer.newLine();
         }
-        public double get(int i) {
-            switch(i) {
-                case 0: return x;
-                case 1: return y;
-                default: throw new IndexOutOfBoundsException();
-            }
-        }
+        writer.flush();
+        writer.close();
     }
 
-    static class SimpleDatabase extends HashSet<Point> implements Database  {
-
-        @Override
-        public int getDimensionality() {
-            return 2;
-        }
-
-        void toFile(File file) throws IOException {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            for (Point p : this) {
-                writer.write(p.get(0) + " " + p.get(1));
-                writer.newLine();
-            }
-            writer.flush();
-            writer.close();
-        }
-
-    }
-
-    static SimpleDatabase fromFile(File file) throws IOException {
-        SimpleDatabase db = new SimpleDatabase();
+    static Database fromFile(File file) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(file));
-        reader.lines().map(line -> line.trim().split("\\s+")).forEach(row -> {
-            db.add(new SimplePoint(Double.parseDouble(row[0]), Double.parseDouble(row[1])));
-        });
+        Database<Point> db = new SimpleDatabase(2);
+        reader.lines()
+                .map(line -> line.trim().split("\\s+"))
+                .map(row -> new SimpleDatabase.SimplePoint(new double[]{Double.parseDouble(row[0]), Double.parseDouble(row[1])}))
+                .forEach(db::add);
         reader.close();
         return db;
     }

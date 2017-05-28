@@ -3,8 +3,8 @@ package spinacht.data;
 import java.util.Collection;
 
 
-public interface Database extends Collection<Point> {
+public interface Database<T extends Point> extends Collection<T> {
 
-    public int getDimensionality();
+    int getDimensionality();
 
 }

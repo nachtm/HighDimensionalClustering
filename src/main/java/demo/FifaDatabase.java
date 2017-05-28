@@ -15,7 +15,7 @@ import java.util.ArrayList;
 /**
  * Created by Micah on 5/24/2017.
  */
-public class FifaDatabase extends ArrayList<Point> implements Database {
+public class FifaDatabase extends ArrayList<Point> implements Database<Point> {
 
 	private int ndims;
 
