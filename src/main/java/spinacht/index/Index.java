@@ -1,14 +1,11 @@
 package spinacht.index;
 
-import java.lang.Double;
-import java.lang.reflect.Array;
-
 import spinacht.data.Database;
+import spinacht.data.Point;
 import spinacht.data.Subset;
 import spinacht.data.Subspace;
-import spinacht.data.Point;
 
-import spinacht.index.RangeTree;
+import java.lang.reflect.Array;
 
 
 public class Index {

@@ -1,10 +1,8 @@
 package spinacht.data;
 
-import java.util.*;
-import java.util.function.*;
-
-import spinacht.data.Subset;
-import spinacht.data.Subspace;
+import java.util.HashSet;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 
 public interface Clustering {

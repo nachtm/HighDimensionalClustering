@@ -1,11 +1,11 @@
 package spinacht.dbscan;
 
-import java.awt.print.Paper;
-import java.util.*;
+import spinacht.data.Point;
+import spinacht.data.Subset;
+import spinacht.data.Subspace;
+import spinacht.index.Index;
 
-import spinacht.common.*;
-import spinacht.data.*;
-import spinacht.index.*;
+import java.util.*;
 
 /**
  * DBSCAN as implemented by the original paper.

@@ -1,15 +1,16 @@
 package demo;
 
+import com.opencsv.CSVReader;
+import spinacht.data.Database;
+import spinacht.data.Point;
+
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.FileNotFoundException;
-import java.util.*;
-import java.util.stream.*;
-
-import com.opencsv.CSVReader;
-
-import spinacht.data.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 
 public class SimpleDatabase extends ArrayList<Point> implements Database {

@@ -1,7 +1,10 @@
 package spinacht.subclu;
 
 import spinacht.common.Params;
-import spinacht.data.*;
+import spinacht.data.InMemoryClustering;
+import spinacht.data.Subset;
+import spinacht.data.Subspace;
+import spinacht.data.SubspaceWrapper;
 import spinacht.dbscan.DBSCANNER;
 import spinacht.dbscan.PaperDBScanner;
 import spinacht.index.Index;

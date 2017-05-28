@@ -1,7 +1,7 @@
 package spinacht.subclu;
 
-import spinacht.data.Clustering;
 import spinacht.common.Params;
+import spinacht.data.Clustering;
 
 
 public class SUBCLU {

@@ -1,17 +1,17 @@
 package spinacht.subclu;
 
-import java.lang.*;
-import java.util.*;
-import java.util.function.*;
-
+import spinacht.common.Params;
 import spinacht.data.Clustering;
 import spinacht.data.Subset;
 import spinacht.data.Subspace;
 import spinacht.data.SubspaceWrapper;
-import spinacht.common.Params;
 import spinacht.dbscan.DBSCANNER;
 import spinacht.dbscan.PaperDBScanner;
 import spinacht.index.Index;
+
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 
 class Trie implements Clustering {

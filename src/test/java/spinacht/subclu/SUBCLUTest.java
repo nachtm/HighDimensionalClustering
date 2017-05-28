@@ -1,16 +1,14 @@
 package spinacht.subclu;
 
-import java.io.File;
-
+import demo.SimpleDatabase;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
+import spinacht.common.Params;
 import spinacht.data.Database;
 import spinacht.data.Point;
-import spinacht.common.Params;
 
-import demo.SimpleDatabase;
+import java.io.File;
 
 
 public class SUBCLUTest extends TestCase {

@@ -1,12 +1,17 @@
 package demo;
 
-import java.nio.file.*;
-import java.util.*;
-import java.util.stream.*;
+import spinacht.common.Params;
+import spinacht.data.Database;
+import spinacht.data.Point;
+import spinacht.data.Subspace;
+import spinacht.subclu.SUBCLU;
 
-import spinacht.data.*;
-import spinacht.common.*;
-import spinacht.subclu.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 
 public class DemoDatabase extends ArrayList<Point> implements Database {

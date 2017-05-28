@@ -1,13 +1,8 @@
 package spinacht.index;
 
-import java.util.Comparator;
-import java.util.LinkedList;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
-import spinacht.index.RangeTree;
 
 
 public class RangeTreeTest extends TestCase {

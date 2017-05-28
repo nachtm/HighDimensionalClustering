@@ -1,27 +1,22 @@
 package spinacht.viz;
 
-import java.io.*;
-import java.nio.Buffer;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.util.*;
-
+import com.google.common.collect.Iterables;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-
-import com.google.common.collect.Iterables;
-
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import spinacht.common.Params;
 import spinacht.data.*;
 import spinacht.subclu.SUBCLU;
-import sun.java2d.pipe.SpanShapeRenderer;
+
+import java.io.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 
 /**
  * Created by nachtm on 5/14/17.

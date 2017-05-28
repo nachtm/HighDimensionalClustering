@@ -1,6 +1,7 @@
 package spinacht.dbscan;
 
-import spinacht.data.*;
+import spinacht.data.Subset;
+import spinacht.data.Subspace;
 
 import java.util.Collection;
 

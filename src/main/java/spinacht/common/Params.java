@@ -1,7 +1,5 @@
 package spinacht.common;
 
-import java.lang.Iterable;
-
 import spinacht.data.Database;
 
 
