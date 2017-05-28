@@ -43,6 +43,7 @@ public class Visualizer extends Application {
         view.isClustered.addListener(x_ -> this.render());
 
         this.view.clearButton.setOnMouseClicked(e -> {
+            this.view.isClustered.set(false);
             this.db.clear();
             this.render();
         });
@@ -85,8 +86,8 @@ public class Visualizer extends Application {
 
         for (Point point : this.db) {
             mid.fillOval(point.get(0) - 2, point.get(1) - 2, 5, 5);
-            top.fillOval(point.get(0) - 2, 12, 5, 5);
-            left.fillOval(12, point.get(1) - 2, 5, 5);
+            top.fillOval(point.get(0) - 2, 11, 5, 5);
+            left.fillOval(11, point.get(1) - 2, 5, 5);
         }
 
     }
@@ -114,9 +115,9 @@ public class Visualizer extends Application {
                 notNoise.addAll(s);
                 for (Point p : s) {
                     if (Iterables.elementsEqual(subspace, Subspace.of(0))) {
-                        gc.fillOval(p.get(0) - eps, 8, 2 * eps + 1, 14);
+                        gc.fillOval(p.get(0) - eps, 6, 2 * eps + 1, 14);
                     } else if (Iterables.elementsEqual(subspace, Subspace.of(1))) {
-                        gc.fillOval(8, p.get(1) - eps, 14, 2 * eps + 1);
+                        gc.fillOval(6, p.get(1) - eps, 14, 2 * eps + 1);
                     } else {
                         gc.fillOval(p.get(0) - eps, p.get(1) - eps, 2 * eps + 1, 2 * eps + 1);
                     }
@@ -129,9 +130,9 @@ public class Visualizer extends Application {
                 gc.setFill(colors.next());
                 for (Point p : s) {
                     if (Iterables.elementsEqual(subspace, Subspace.of(0))) {
-                        gc.fillOval(p.get(0) - 2, 12, 5,5);
+                        gc.fillOval(p.get(0) - 2, 11, 5,5);
                     } else if (Iterables.elementsEqual(subspace, Subspace.of(1))) {
-                        gc.fillOval(12,p.get(1) - 2, 5,5);
+                        gc.fillOval(11,p.get(1) - 2, 5,5);
                     } else {
                         gc.fillOval(p.get(0) - 2, p.get(1) - 2, 5, 5);
                     }
@@ -143,9 +144,9 @@ public class Visualizer extends Application {
             for (Point p : this.db) {
                 if (!notNoise.contains(p)) {
                     if (Iterables.elementsEqual(subspace, Subspace.of(0))) {
-                        gc.fillOval(p.get(0) - 2, 12, 5,5);
+                        gc.fillOval(p.get(0) - 2, 11, 5,5);
                     } else if (Iterables.elementsEqual(subspace, Subspace.of(1))) {
-                        gc.fillOval(12,p.get(1) - 2, 5,5);
+                        gc.fillOval(11,p.get(1) - 2, 5,5);
                     } else {
                         gc.fillOval(p.get(0) - 2, p.get(1) - 2, 5, 5);
                     }

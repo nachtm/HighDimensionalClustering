@@ -1,15 +1,15 @@
 package spinacht.viz;
 
 import javafx.beans.property.*;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
 
-class View extends FlowPane {
+
+class View extends HBox {
 
     final Canvas mid;
     final Canvas top;
@@ -25,7 +25,9 @@ class View extends FlowPane {
 
     View() {
 
-        super(Orientation.HORIZONTAL);
+        super();
+
+        this.setPadding(new Insets(10, 10, 10, 10));
 
         this.mid = new Canvas(500, 500);
         this.top = new Canvas(500, 25);
@@ -40,9 +42,9 @@ class View extends FlowPane {
         leftPane.getStyleClass().add("bordered");
 
         GridPane canvases = new GridPane();
-        canvases.add(leftPane, 0, 1);
-        canvases.add(topPane, 1, 0);
-        canvases.add(midPane, 1, 1);
+        canvases.add(leftPane, 0,0);
+        canvases.add(topPane, 1, 1);
+        canvases.add(midPane, 1, 0);
         this.getChildren().add(canvases);
 
         ToggleButton clusterToggle = new ToggleButton("Cluster");
@@ -50,31 +52,34 @@ class View extends FlowPane {
         this.clearButton = new Button("Clear");
         this.saveButton = new Button("Save");
         this.loadButton = new Button("Load");
-        FlowPane buttons = new FlowPane(clusterToggle, this.clearButton, this.saveButton, this.loadButton);
-        buttons.setHgap(5);
+        HBox buttons = new HBox(5, clusterToggle, this.clearButton, this.saveButton, this.loadButton);
 
-        Spinner ptSpinner = new Spinner<>(1, Integer.MAX_VALUE, 5, 1);
-        ptSpinner.setEditable(true);
-        this.minPts = ptSpinner.valueProperty();
-        FlowPane numPoints = new FlowPane(new Label("minPts:"), ptSpinner);
+        Spinner<Integer> minPtsSpinner = new Spinner<>(1, Integer.MAX_VALUE, 5, 1);
+        minPtsSpinner.setEditable(true);
+        this.minPts = minPtsSpinner.valueProperty();
+        FlowPane minPtsInput = new FlowPane(10, 10, new Label("minPts:"), minPtsSpinner);
 
-        Slider epsSlider = new Slider(1, 150, 10);
-        epsSlider.setOrientation(Orientation.VERTICAL);
+        Slider epsSlider = new Slider(1, 120, 10);
+        epsSlider.setOrientation(Orientation.HORIZONTAL);
+        epsSlider.setMinWidth(203);
         this.eps = epsSlider.valueProperty();
-        Canvas epsilonPreview = new Canvas(301, 301);
-        FlowPane epsilonSetter = new FlowPane(epsSlider, epsilonPreview);
+        FlowPane epsInput = new FlowPane(5, 5, new Label("eps:"), epsSlider);
 
-        this.eps.addListener((IDONTCARE, oldVal, newVal) -> {
-            GraphicsContext gc = epsilonPreview.getGraphicsContext2D();
-            gc.clearRect(0, 0, 301, 301);
-            gc.fillOval(150 - this.eps.get(), 150 - this.eps.get(), 2*this.eps.get() + 1, 2*this.eps.get() + 1);
+        Canvas epsPreview = new Canvas(241, 241);
+
+        this.eps.addListener((x_, oldVal, newVal) -> {
+            GraphicsContext gc = epsPreview.getGraphicsContext2D();
+            gc.clearRect(0, 0, 241, 241);
+            gc.fillOval(120 - this.eps.get(), 120 - this.eps.get(), 2*this.eps.get() + 1, 2*this.eps.get() + 1);
         });
 
-        FlowPane controls = new FlowPane(Orientation.VERTICAL, buttons, numPoints, epsilonSetter);
-        controls.setVgap(10);
+        this.eps.setValue(30);
+
+        VBox controls = new VBox(10, buttons, minPtsInput, epsInput, epsPreview);
+        controls.setPadding(new Insets(10, 10, 10, 10));
         this.getChildren().add(controls);
 
-        this.setStyle("-fx-focus-color: transparent;");
+        // this.setStyle("-fx-focus-color: transparent;");
         // this.setStyle("-fx-background-color: linear-gradient(to bottom, derive(-fx-text-box-border, -10%), -fx-text-box-border), linear-gradient(from 0px 0px to 0px 5px, derive(-fx-control-inner-background, -9%), -fx-control-inner-background);");
         // this.setStyle("-fx-focus-color: -fx-control-inner-background ; -fx-faint-focus-color: -fx-control-inner-background ;");
 
