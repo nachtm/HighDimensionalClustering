@@ -8,10 +8,9 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import spinacht.common.Params;
+import spinacht.Params;
 import spinacht.data.*;
 import spinacht.subclu.DumbSUBCLU;
-import spinacht.subclu.SUBCLU;
 
 import java.io.*;
 import java.util.Arrays;

@@ -1,6 +1,6 @@
 package spinacht.subclu;
 
-import spinacht.common.Params;
+import spinacht.Params;
 import spinacht.data.Clustering;
 
 

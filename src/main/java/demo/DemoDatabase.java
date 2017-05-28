@@ -1,6 +1,6 @@
 package demo;
 
-import spinacht.common.Params;
+import spinacht.Params;
 import spinacht.data.Database;
 import spinacht.data.Point;
 import spinacht.data.Subspace;

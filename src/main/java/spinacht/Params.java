@@ -1,4 +1,4 @@
-package spinacht.common;
+package spinacht;
 
 import spinacht.data.Database;
 

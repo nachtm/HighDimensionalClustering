@@ -4,7 +4,7 @@ import demo.SimpleDatabase;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import spinacht.common.Params;
+import spinacht.Params;
 import spinacht.data.Database;
 import spinacht.data.Point;
 

@@ -1,8 +1,6 @@
 package spinacht.subclu;
 
-import com.google.common.collect.Iterators;
-import com.google.common.collect.Lists;
-import spinacht.common.Params;
+import spinacht.Params;
 import spinacht.data.*;
 import spinacht.dbscan.DBSCANNER;
 import spinacht.dbscan.PaperDBScanner;
@@ -10,7 +8,6 @@ import spinacht.index.Index;
 
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Set;
 import java.util.function.Consumer;
 
 /**
