@@ -13,16 +13,16 @@ import java.util.Iterator;
 import java.util.stream.Collectors;
 
 
-public class SimpleLabeledDatabase<T> extends ArrayList<SimpleLabeledDatabase.LabeledPoint<T>> implements Database<SimpleLabeledDatabase.LabeledPoint<T>> {
+public class SimpleLabeledDatabase<T> extends ArrayList<SimpleLabeledDatabase.SimpleLabeledPoint<T>> implements Database<SimpleLabeledDatabase.SimpleLabeledPoint<T>> {
 
     private final int ndims;
 
-    public static class LabeledPoint<T> implements Point {
+    public static class SimpleLabeledPoint<T> implements Point {
 
         final private double[] point;
         final private T label;
 
-        public LabeledPoint(double[] point, T label) {
+        public SimpleLabeledPoint(double[] point, T label) {
             this.point = point;
             this.label = label;
         }
@@ -39,6 +39,31 @@ public class SimpleLabeledDatabase<T> extends ArrayList<SimpleLabeledDatabase.La
             return "[" + Arrays.stream(this.point).mapToObj(Double::toString).collect(Collectors.joining(", ")) + "] " + this.label;
         }
 
+        public boolean equals(Object other) {
+            if (this == other) {
+                return true;
+            } else if (other instanceof SimpleLabeledPoint) {
+                SimpleLabeledPoint other_ = (SimpleLabeledPoint) other;
+                for (int i = 0; i < this.point.length; i++) {
+                    if (this.get(i) != other_.get(i)) {
+                        return false;
+                    }
+                }
+                return this.getLabel().equals(other_.getLabel());
+            } else {
+                return false;
+            }
+        }
+
+        public int hashCode() {
+            int x = 0;
+            for (Double d : this.point) {
+                x ^= Double.hashCode(d);
+            }
+            x ^= this.label.hashCode();
+            return x;
+        }
+
     }
 
     public SimpleLabeledDatabase(int ndims) {
@@ -46,7 +71,7 @@ public class SimpleLabeledDatabase<T> extends ArrayList<SimpleLabeledDatabase.La
         this.ndims = ndims;
     }
 
-    public SimpleLabeledDatabase(int ndims, Iterator<LabeledPoint<T>> points) {
+    public SimpleLabeledDatabase(int ndims, Iterator<SimpleLabeledPoint<T>> points) {
         this(ndims);
         Iterators.addAll(this, points);
     }
