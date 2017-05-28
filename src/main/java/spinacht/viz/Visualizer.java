@@ -1,9 +1,6 @@
 package spinacht.viz;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.HashSet;
+import java.util.*;
 import java.util.function.Function;
 
 import javafx.application.Application;
@@ -93,29 +90,29 @@ public class Visualizer extends Application {
 
     }
 
+    private boolean subspaceIs(Subspace subspace, Integer... cmp) {
+        return Iterables.elementsEqual(subspace, Arrays.asList(cmp));
+    }
+
     private Canvas getCanvasOf(Subspace subspace) {
-        return Iterables.elementsEqual(subspace, Subspace.of(0))
-             ? view.top
-             : Iterables.elementsEqual(subspace, Subspace.of(1))
-             ? view.left
-             : view.mid
-             ;
+        return subspaceIs(subspace, 0) ? view.top : subspaceIs(subspace, 1) ? view.left : view.mid;
     }
 
     private void drawPointIn(Point p, Subspace subspace) {
-        if (Iterables.elementsEqual(subspace, Subspace.of(0))) {
-            view.top.getGraphicsContext2D().fillOval(p.get(0) - 2, 11, 5,5);
-        } else if (Iterables.elementsEqual(subspace, Subspace.of(1))) {
+        if (subspaceIs(subspace, 0)) {
+            view.top.getGraphicsContext2D().fillOval(p.get(0) - 2, 11, 5, 5);
+        } else if (subspaceIs(subspace, 1)) {
             view.left.getGraphicsContext2D().fillOval(11,p.get(1) - 2, 5,5);
         } else {
+            System.out.println(Subspace.pprint(subspace));
             view.mid.getGraphicsContext2D().fillOval(p.get(0) - 2, p.get(1) - 2, 5, 5);
         }
     }
 
     private void drawRegionIn(Point p, double eps, Subspace subspace) {
-        if (Iterables.elementsEqual(subspace, Subspace.of(0))) {
+        if (subspaceIs(subspace, 0)) {
             view.top.getGraphicsContext2D().fillOval(p.get(0) - eps, 6, 2 * eps + 1, 14);
-        } else if (Iterables.elementsEqual(subspace, Subspace.of(1))) {
+        } else if (subspaceIs(subspace,1)) {
             view.left.getGraphicsContext2D().fillOval(6, p.get(1) - eps, 14, 2 * eps + 1);
         } else {
             view.mid.getGraphicsContext2D().fillOval(p.get(0) - eps, p.get(1) - eps, 2 * eps + 1, 2 * eps + 1);
@@ -126,15 +123,21 @@ public class Visualizer extends Application {
 
         clearCanvases();
 
-        for (Map.Entry<Subspace, Set<Subset>> entry : clustering.entrySet()) {
+        Iterable<TransparentSubspace> subspaces = Arrays.asList(
+            new SubspaceWrapper(0),
+            new SubspaceWrapper(1),
+            new SubspaceWrapper(1, 0)
+        );
 
-            final Subspace subspace = entry.getKey();
+        for (TransparentSubspace subspace : subspaces) {
+
+            final Set<Subset> subsets = clustering.getOrDefault(subspace, new HashSet<>());
             final GraphicsContext gc = getCanvasOf(subspace).getGraphicsContext2D();
             final Set<Point> notNoise = new HashSet<>();
 
             Iterator<Color> colors = COLORS.iterator();
 
-            for (Subset s : entry.getValue()) {
+            for (Subset s : subsets) {
                 gc.setFill(background(colors.next()));
                 notNoise.addAll(s);
                 for (Point p : s) {
@@ -144,7 +147,7 @@ public class Visualizer extends Application {
 
             colors = COLORS.iterator();
 
-            for (Subset s : entry.getValue()) {
+            for (Subset s : subsets) {
                 gc.setFill(colors.next());
                 for (Point p : s) {
                     drawPointIn(p, subspace);

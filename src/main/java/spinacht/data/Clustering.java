@@ -14,7 +14,7 @@ public interface Clustering {
     default InMemoryClustering collect() {
         InMemoryClustering collected = new InMemoryClustering();
         this.forEachCluster(subspace -> subset ->
-                collected.compute(subspace, (IDONTCARE, curr) -> {
+                collected.compute(new SubspaceWrapper(subspace), (IDONTCARE, curr) -> {
                     if (curr == null) {
                         curr = new HashSet<>();
                         curr.add(subset);

@@ -1,10 +1,7 @@
 package spinacht.subclu;
 
 import spinacht.common.Params;
-import spinacht.data.Clustering;
-import spinacht.data.InMemoryClustering;
-import spinacht.data.Subset;
-import spinacht.data.Subspace;
+import spinacht.data.*;
 import spinacht.dbscan.DBSCANNER;
 import spinacht.dbscan.PaperDBScanner;
 import spinacht.index.Index;
@@ -30,9 +27,9 @@ public class DumbSUBCLU {
         InMemoryClustering result = new InMemoryClustering();
 
         BiFunction<Subspace, Set<Subset>, Set<Subset>> addToMap = (subspace, subset) -> new HashSet<>(ds.dbscan(subspace, everything));
-        result.compute(Subspace.of(0),   addToMap);
-        result.compute(Subspace.of(1),   addToMap);
-        result.compute(Subspace.of(0,1), addToMap);
+        result.compute(new SubspaceWrapper(0), addToMap);
+        result.compute(new SubspaceWrapper(1), addToMap);
+        result.compute(new SubspaceWrapper(0, 1), addToMap);
 
         return result;
     }
