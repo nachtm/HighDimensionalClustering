@@ -27,7 +27,12 @@ class Trie implements Clustering {
     }
 
     boolean extend() {
+        return extend(false);
+    }
+
+    boolean extend(boolean verbose){
         Node[] marks = new Node[this.params.getDatabase().getDimensionality()];
+        System.out.println("marks found");
         return root.extend(0, marks, new LinkedList<>());
     }
 
@@ -94,6 +99,7 @@ class Trie implements Clustering {
         }
 
         boolean extend(int k, Node[] marks, LinkedList<Integer> path) {
+
             if (this.children == null) {
                 Set<Integer> candidates = new HashSet<>(marks[0].children.keySet());
                 for (int i = 1; i < k; i++) {
