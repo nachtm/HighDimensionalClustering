@@ -1,14 +1,22 @@
 package spinacht.data;
 
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.LinkedList;
 
 
 public class SubspaceWrapper implements TransparentSubspace {
 
     private final Iterable<Integer> wrapped;
+
+    public SubspaceWrapper(Iterator<Integer> contents) {
+        LinkedList<Integer> list = new LinkedList<>();
+        Iterators.addAll(list, contents);
+        this.wrapped = list;
+    }
 
     public SubspaceWrapper(Iterable<Integer> wrapped) {
     this.wrapped = wrapped;

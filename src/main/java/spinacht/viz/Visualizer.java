@@ -10,6 +10,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import spinacht.common.Params;
 import spinacht.data.*;
+import spinacht.subclu.DumbSUBCLU;
 import spinacht.subclu.SUBCLU;
 
 import java.io.*;
@@ -105,7 +106,7 @@ public class Visualizer extends Application {
         if (this.view.isClustered.get()) {
             double eps = view.eps.doubleValue();
             int minPts = view.minPts.get();
-            InMemoryClustering clustering = SUBCLU.go(new Params(eps, minPts, this.db)).collect();
+            InMemoryClustering clustering = DumbSUBCLU.go(new Params(eps, minPts, this.db)).collect();
             this.renderClustering(eps, clustering);
         } else {
             this.renderPoints();
@@ -146,7 +147,6 @@ public class Visualizer extends Application {
         } else if (subspaceIs(subspace, 1)) {
             view.left.getGraphicsContext2D().fillOval(11,p.get(1) - 2, 5,5);
         } else {
-            System.out.println(Subspace.pprint(subspace));
             view.mid.getGraphicsContext2D().fillOval(p.get(0) - 2, p.get(1) - 2, 5, 5);
         }
     }
@@ -248,7 +248,6 @@ public class Visualizer extends Application {
         void toFile(File file) throws IOException {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
             for (Point p : this) {
-                System.out.println(p);
                 writer.write(p.get(0) + " " + p.get(1));
                 writer.newLine();
             }
@@ -262,7 +261,6 @@ public class Visualizer extends Application {
         SimpleDatabase db = new SimpleDatabase();
         BufferedReader reader = new BufferedReader(new FileReader(file));
         reader.lines().map(line -> line.trim().split("\\s+")).forEach(row -> {
-            System.out.println(row[0]);
             db.add(new SimplePoint(Double.parseDouble(row[0]), Double.parseDouble(row[1])));
         });
         reader.close();
