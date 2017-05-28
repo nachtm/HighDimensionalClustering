@@ -110,23 +110,6 @@ public class PaperDBScanner implements DBSCANNER {
                         }
                     }
                 }
-//                for (Iterator<Point> it = seeds.iterator(); it.hasNext(); ) {
-//                    Point currP = it.next();
-//                    it.remove();
-//                    Subset result = PaperDBScanner.this.index.epsNeighborhood(eps, currP, space, setOfPoints);
-//                    if (result.size() >= minPts) {
-//                        for (Point resultP : result) {
-//                            int resultPLabel = labels.get(resultP);
-//                            if (resultPLabel == UNCLASSIFIED || resultPLabel == NOISE) {
-//                                if (resultPLabel == UNCLASSIFIED) {
-////                                    seeds.add(resultP);
-//
-//                                }
-//                                labels.put(resultP, clusterId);
-//                            }
-//                        }
-//                    }
-//                }
                 return true;
             }
         }
