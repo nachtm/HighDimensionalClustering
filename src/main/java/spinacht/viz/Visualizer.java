@@ -1,10 +1,17 @@
 package spinacht.viz;
 
+import java.io.*;
+import java.nio.Buffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
@@ -14,13 +21,14 @@ import com.google.common.collect.Iterables;
 import spinacht.common.Params;
 import spinacht.data.*;
 import spinacht.subclu.SUBCLU;
+import sun.java2d.pipe.SpanShapeRenderer;
 
 /**
  * Created by nachtm on 5/14/17.
  */
 public class Visualizer extends Application {
 
-    private final Database db = new SimpleDatabase();
+    private SimpleDatabase db = new SimpleDatabase();
     private View view = new View();
 
     @Override
@@ -38,10 +46,38 @@ public class Visualizer extends Application {
 
         view.isClustered.addListener(x_ -> this.render());
 
-        this.view.clearButton.setOnMouseClicked(e -> {
+        this.view.clearButton.setOnMouseClicked(x_ -> {
             this.view.isClustered.set(false);
             this.db.clear();
             this.render();
+        });
+
+        this.view.saveButton.setOnMouseClicked(x_ -> {
+            FileChooser chooser = new FileChooser();
+            chooser.setTitle("Save Points");
+            chooser.setInitialFileName("WHEREISTHIS");
+            File file = chooser.showOpenDialog(primaryStage);
+            if (file != null) {
+                try {
+                    this.db.toFile(file);
+                } catch (IOException e) {
+                    System.out.println(e);
+                }
+            }
+        });
+
+        this.view.loadButton.setOnMouseClicked(x_ -> {
+            FileChooser chooser = new FileChooser();
+            chooser.setTitle("Load Points");
+            File file = chooser.showOpenDialog(primaryStage);
+            if (file != null) {
+                try {
+                    this.db = fromFile(file);
+                    this.render();
+                } catch (IOException e) {
+                    System.out.println(e);
+                }
+            }
         });
 
         this.render();
@@ -207,11 +243,35 @@ public class Visualizer extends Application {
         }
     }
 
-    private class SimpleDatabase extends HashSet<Point> implements Database  {
+    static class SimpleDatabase extends HashSet<Point> implements Database  {
+
         @Override
         public int getDimensionality() {
             return 2;
         }
+
+        void toFile(File file) throws IOException {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+            for (Point p : this) {
+                System.out.println(p);
+                writer.write(p.get(0) + " " + p.get(1));
+                writer.newLine();
+            }
+            writer.flush();
+            writer.close();
+        }
+
+    }
+
+    static SimpleDatabase fromFile(File file) throws IOException {
+        SimpleDatabase db = new SimpleDatabase();
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+        reader.lines().map(line -> line.trim().split("\\s+")).forEach(row -> {
+            System.out.println(row[0]);
+            db.add(new SimplePoint(Double.parseDouble(row[0]), Double.parseDouble(row[1])));
+        });
+        reader.close();
+        return db;
     }
 
 }
