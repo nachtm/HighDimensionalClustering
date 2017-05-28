@@ -6,7 +6,10 @@ import javafx.geometry.Orientation;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 
 
 class View extends HBox {
@@ -70,12 +73,15 @@ class View extends HBox {
         this.eps.addListener((x_, oldVal, newVal) -> {
             GraphicsContext gc = epsPreview.getGraphicsContext2D();
             gc.clearRect(0, 0, 2*epsMax + 1, 2*epsMax + 1);
+            gc.setFill(Color.LIGHTGRAY);
+            gc.fillRect(0, 0, 2*epsMax + 1, 2*epsMax + 1);
+            gc.setFill(Color.BLACK);
             gc.fillOval(epsMax - this.eps.get(), epsMax - this.eps.get(), 2*this.eps.get() + 1, 2*this.eps.get() + 1);
         });
 
         this.eps.setValue(30);
 
-        VBox controls = new VBox(10, buttons, minPtsInput, epsSlider, epsPreview);
+        VBox controls = new VBox(10, buttons, minPtsInput, epsPreview, epsSlider);
         this.getChildren().add(controls);
 
         // this.setStyle("-fx-focus-color: transparent;");
