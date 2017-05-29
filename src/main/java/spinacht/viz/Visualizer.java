@@ -54,14 +54,15 @@ public class Visualizer extends Application {
             this.render();
         });
 
+        FileChooser chooser = new FileChooser();
+
         this.view.saveButton.setOnMouseClicked(x_ -> {
-            FileChooser chooser = new FileChooser();
             chooser.setTitle("Save Points");
-            chooser.setInitialFileName("WHEREISTHIS");
-            File file = chooser.showOpenDialog(primaryStage);
+            File file = chooser.showSaveDialog(primaryStage);
             if (file != null) {
                 try {
                     toFile(file, this.db);
+                    chooser.setInitialDirectory(file.getParentFile());
                 } catch (IOException e) {
                     System.out.println(e);
                 }
@@ -69,13 +70,13 @@ public class Visualizer extends Application {
         });
 
         this.view.loadButton.setOnMouseClicked(x_ -> {
-            FileChooser chooser = new FileChooser();
             chooser.setTitle("Load Points");
             File file = chooser.showOpenDialog(primaryStage);
             if (file != null) {
                 try {
                     this.db = fromFile(file);
                     this.render();
+                    chooser.setInitialDirectory(file.getParentFile());
                 } catch (IOException e) {
                     System.out.println(e);
                 }
