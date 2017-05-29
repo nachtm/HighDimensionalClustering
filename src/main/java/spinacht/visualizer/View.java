@@ -69,6 +69,8 @@ class View extends HBox {
         epsSlider.setOrientation(Orientation.HORIZONTAL);
         epsSlider.setMinWidth(2*epsMax + 1);
         epsSlider.setMaxWidth(2*epsMax + 1);
+        epsSlider.setMajorTickUnit(15);
+        epsSlider.setShowTickMarks(true);
         this.eps = epsSlider.valueProperty();
 
         Canvas epsPreview = new Canvas(2*epsMax + 1, 2*epsMax + 1);
