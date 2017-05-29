@@ -22,6 +22,7 @@ class View extends HBox {
     final ReadOnlyObjectProperty<Integer> minPts;
 
     final BooleanProperty isClustered;
+    final BooleanProperty isErasing;
     final Button clearButton;
     final Button saveButton;
     final Button loadButton;
@@ -51,10 +52,12 @@ class View extends HBox {
 
         ToggleButton clusterToggle = new ToggleButton("Cluster");
         this.isClustered = clusterToggle.selectedProperty();
+        ToggleButton eraseToggle = new ToggleButton("Erase");
+        this.isErasing = eraseToggle.selectedProperty();
         this.clearButton = new Button("Clear");
         this.saveButton = new Button("Save");
         this.loadButton = new Button("Load");
-        HBox buttons = new HBox(5, clusterToggle, this.clearButton, this.saveButton, this.loadButton);
+        HBox buttons = new HBox(5, clusterToggle, eraseToggle, this.clearButton, this.saveButton, this.loadButton);
 
         Spinner<Integer> minPtsSpinner = new Spinner<>(1, Integer.MAX_VALUE, 5, 1);
         minPtsSpinner.setEditable(true);

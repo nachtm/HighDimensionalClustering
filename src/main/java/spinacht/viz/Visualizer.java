@@ -31,10 +31,15 @@ public class Visualizer extends Application {
     @Override
     public void start(Stage primaryStage) {
 
-        this.view.mid.setOnMouseClicked(e -> {
-            double x = e.getX();
-            double y = e.getY();
-            this.db.add(new SimpleDatabase.SimplePoint(x, y));
+        this.view.mid.setOnMouseClicked(ev -> {
+            double x = ev.getX();
+            double y = ev.getY();
+            if (this.view.isErasing.get()) {
+                int eps = 5;
+                this.db.removeIf(p -> Math.pow(p.get(0) - x, 2) + Math.pow(p.get(1) - y, 2) < eps*eps);
+            } else {
+                this.db.add(new SimpleDatabase.SimplePoint(x, y));
+            }
             this.render();
         });
 
