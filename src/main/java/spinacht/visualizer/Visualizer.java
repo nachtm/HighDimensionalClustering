@@ -2,9 +2,12 @@ package spinacht.visualizer;
 
 import com.google.common.collect.Iterables;
 import javafx.application.Application;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -12,6 +15,7 @@ import spinacht.Params;
 import spinacht.data.*;
 import spinacht.subclu.DumbSUBCLU;
 
+import javax.imageio.ImageIO;
 import java.io.*;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -47,6 +51,7 @@ public class Visualizer extends Application {
         this.view.minPts.addListener(x_ -> this.render());
 
         view.isClustered.addListener(x_ -> this.render());
+        view.hideNeighborhoods.addListener(x_ -> this.render());
 
         this.view.clearButton.setOnMouseClicked(x_ -> {
             this.view.isClustered.set(false);
@@ -77,6 +82,22 @@ public class Visualizer extends Application {
                     this.db = fromFile(file);
                     this.render();
                     chooser.setInitialDirectory(file.getParentFile());
+                } catch (IOException e) {
+                    System.out.println(e);
+                }
+            }
+        });
+
+        FileChooser snapshotChooser = new FileChooser();
+
+        this.view.snapshotButton.setOnMouseClicked(x_ -> {
+            snapshotChooser.setTitle("Save Snapshot");
+            File file = snapshotChooser.showSaveDialog(primaryStage);
+            if (file != null) {
+                try {
+                   WritableImage image = this.view.snapshotAllSubspaces(new SnapshotParameters(), null);
+                    ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", new File(file.toString() + ".png"));
+                    snapshotChooser.setInitialDirectory(file.getParentFile());
                 } catch (IOException e) {
                     System.out.println(e);
                 }
@@ -186,18 +207,19 @@ public class Visualizer extends Application {
 
             Iterator<Color> colors = COLORS.iterator();
 
-            for (Subset s : subsets) {
-                gc.setFill(background(colors.next()));
-                notNoise.addAll(s);
-                for (Point p : s) {
-                    drawRegionIn(p, eps, subspace);
+            if (!this.view.hideNeighborhoods.get()) {
+                for (Subset s : subsets) {
+                    gc.setFill(background(colors.next()));
+                    for (Point p : s) {
+                        drawRegionIn(p, eps, subspace);
+                    }
                 }
+                colors = COLORS.iterator();
             }
-
-            colors = COLORS.iterator();
 
             for (Subset s : subsets) {
                 gc.setFill(colors.next());
+                notNoise.addAll(s);
                 for (Point p : s) {
                     drawPointIn(p, subspace);
                 }
