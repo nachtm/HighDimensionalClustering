@@ -1,4 +1,4 @@
-package spinacht.viz;
+package spinacht.visualizer;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;

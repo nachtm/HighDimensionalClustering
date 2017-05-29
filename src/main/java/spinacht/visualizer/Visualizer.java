@@ -1,4 +1,4 @@
-package spinacht.viz;
+package spinacht.visualizer;
 
 import com.google.common.collect.Iterables;
 import javafx.application.Application;
