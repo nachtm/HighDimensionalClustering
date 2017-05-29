@@ -10,16 +10,19 @@ repositories {
 
 dependencies {
     compile 'com.google.guava:guava:21.0'
-    compile 'com.opencsv:opencsv:3.9'
     testCompile 'junit:junit:4.12'
 }
 
-task fatJar(type: Jar) {
+task visJar(type: Jar) {
 	manifest {
         attributes 'Main-Class': 'spinacht.visualizer.Visualizer'
     }
-    baseName = project.name + '-all'
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    baseName = project.name + '-visualizer'
+    from {
+        configurations.compile.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
     with jar
 }
 
