@@ -107,6 +107,7 @@ public class Visualizer extends Application {
         this.render();
 
         Scene scene = new Scene(this.view);
+        primaryStage.setTitle("spinacht - SUBCLU Visualizer");
         primaryStage.setScene(scene);
         primaryStage.show();
         scene.getStylesheets().add(Visualizer.class.getResource("main.css").toExternalForm());
