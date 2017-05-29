@@ -4,19 +4,5 @@
 
 .slider .thumb {
   -fx-background-size: contain;
-  -fx-padding: 15;
+  -fx-padding: 12;
 }
-
-/*
-#root {
-    -fx-padding: 10, 10, 10, 10;
-}
-*/
-
-/* thanks to https://stackoverflow.com/questions/27083027/draw-border-around-a-canvas */
-.bordered {
-    -fx-background-color: black, white;
-    -fx-background-insets: 0, 2;
-    -fx-padding: 0;
-}
-
