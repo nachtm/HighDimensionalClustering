@@ -25,13 +25,7 @@ public class SUBCLU {
      */
     public static Clustering go(Params params, boolean verbose){
         Trie trie = new Trie(params);
-        int k = 1;
-        while (trie.extend(verbose)){
-            if(verbose){
-                System.out.println(k);
-                k++;
-            }
-        }
+        while (trie.extend());
         return trie;
     }
 

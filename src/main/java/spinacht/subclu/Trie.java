@@ -14,6 +14,19 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 
+/** This class is complicated. It implements SUBCLU using a trie. It can be
+ * opaquely traversed after clustering is done to retrieve clusters.
+ *
+ * Edges in this trie correspond to dimensions and nodes correspond to subspaces
+ * (equivalent to the path from the root to that node).  The trie is strictly
+ * ordered: edges closer to the root correspond to smaller items (by index) than
+ * children. This ensures that nodes correspond to subspaces and vice
+ * versa. Nodes contain the clusters in their corresponding subspace.  The general
+ * idea is to start with a trie of height 1, and then extend it one level at a
+ * time, only extending to and clustering in subspaces that the A-prior
+ * principle allows, given the monotonicity of density-connectivity.
+ * I used this same algorithm for the Association Rules assignment.
+ */
 class Trie implements Clustering {
 
     private final DBSCANNER dbscanner;
@@ -26,20 +39,26 @@ class Trie implements Clustering {
         this.root = new Node();
     }
 
-    boolean extend() {
-        return extend(false);
-    }
-
-    boolean extend(boolean verbose){
+    /**
+     * Extend the trie by one level, returning whether there were any subspaces
+     * with clusters in the new level. If not then no more clusters will be
+     * found.
+     */
+    boolean extend(){
         Node[] marks = new Node[this.params.getDatabase().getDimensionality()];
-        System.out.println("marks found");
         return root.extend(0, marks, new LinkedList<>());
     }
 
+    /**
+     * Visit each cluster of each subspace.
+     */
     public void forEachCluster(Function<Subspace, Consumer<Subset>> f) {
         this.root.forEachCluster(f);
     }
 
+    /**
+     * Internal node class of trie.
+     */
     private class Node implements Subspace, Clustering {
 
         final Node parent;
@@ -62,7 +81,7 @@ class Trie implements Clustering {
             this.npoints = 0;
         }
 
-        // rest
+        // other nodes
         Node(Node parent, int upEdge, Collection<Subset> clusters) {
             this.parent = parent;
             this.upEdge = upEdge;
@@ -75,6 +94,9 @@ class Trie implements Clustering {
             this.npoints = sum;
         }
 
+        /**
+         * Recursively visit each cluster of each subspace.
+         */
         public void forEachCluster(Function<Subspace, Consumer<Subset>> f) {
             this.clusters.forEach(f.apply(this));
             if (this.children != null) {
@@ -84,6 +106,10 @@ class Trie implements Clustering {
             }
         }
 
+        /**
+         * Iterate through edge values (corresponding to dimensions) from here
+         * to the root. This iteration corresponds to a subspace.
+         */
         public Iterator<Integer> iterator() {
             return new Iterator<Integer>() {
                 private Node curr = Node.this;
