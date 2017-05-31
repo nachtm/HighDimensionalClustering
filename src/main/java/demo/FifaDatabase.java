@@ -107,7 +107,7 @@ public class FifaDatabase extends ArrayList<Point> implements Database<Point> {
 		assert db != null;
 
 		//Cluster data
-		Clustering clustering = SUBCLU.go(new Params(10, 200, db), true);
+		Clustering clustering = SUBCLU.go(new Params(10, 200, db));
 
 		//print stats about the data
 		clustering.forEachCluster(subspace -> {
