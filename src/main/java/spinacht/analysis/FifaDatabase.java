@@ -1,4 +1,4 @@
-package demo;
+package spinacht.analysis;
 
 import spinacht.Params;
 import spinacht.data.*;

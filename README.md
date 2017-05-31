@@ -11,12 +11,13 @@ As usual, our main source is in `src/main`, and tests are in `src/test`.
 Some data sets are discussed in our paper.
 
 As for the source itself, our actual work is in the Java package `spinacht` (`src/main/java/spinacht`).
-This package contains implementations of DBSCAN/SUBCLU, a desktop application for interactively clustering in two dimensions, and various utility classes.
-Instructions for running and using visualizer (`spinacht.visualizer.Visualizer`) can be found below.
+This package contains:
 
-The package `demo` contains code for applications of our implementation to specific data sets.
-Most if its glue for allowing our implementation to interface with the formats of these data sets.
-It is not meant to be used for assessment purposes directly, but some of the results of this code are in our paper.
+*   Implementations of DBSCAN/SUBCLU and their various support classes and
+    functions (`spinacht.data`, `spinacht.index`, `spinacht.dbscan`, and `spinacht.subclu`).
+*   A desktop application for interactively clustering using SUBCLU in two dimensions (`spinacht.visualizer`).
+*   Programs for applying our implementation to specific data sets (`spinacht.analysis`).
+    There were written for us to analyze our implementations along with specific data sets, and are not meant to be user-facing.
 
 ## Usage
 
@@ -25,12 +26,12 @@ It is very easy to use, and is itself contained in this repository.
 
 To build our project and run its tests, run `./gradlew build`.
 
-To run an arbitrary class within our project (with dependencies in scope), run `./run CLASS ARGS...` or `python3 run.py CLASS ARGS`.
+To run an arbitrary class within our project (with runtime dependencies in scope), run `./run CLASS ARGS...` or `python3 run.py CLASS ARGS`.
 
 If you are assessing this project, you will probably just want to run the visualizer.
 This can be done with `./gradlew vis`.
 Alternatively, `./gradlew visJar` creates `./build/libs/spinacht-visualizer.jar` which contains all of its dependencies, and runs the visualizer with `java -jar spinacht-visualizer.jar`.
-For your convenience, we have pre-build this jar, and put it in `./pre-built`.
+For your convenience, we have pre-built this jar, and put it in `./pre-built`.
 
 If any of these instructions don't work, please let us know and we will figure out what's going on.
 

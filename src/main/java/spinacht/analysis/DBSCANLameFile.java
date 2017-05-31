@@ -1,4 +1,4 @@
-package demo;
+package spinacht.analysis;
 
 import com.google.common.base.Stopwatch;
 import spinacht.data.*;
