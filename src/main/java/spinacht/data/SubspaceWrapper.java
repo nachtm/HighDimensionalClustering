@@ -7,21 +7,35 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-
+/**
+ * A wrapper around a subspace that hashes and is equal in a manner befitting a TransparentSubspace.
+ */
 public class SubspaceWrapper implements TransparentSubspace {
 
     private final Iterable<Integer> wrapped;
 
+    /**
+     * Initialize a SubspaceWrapper with these dimensions.
+     * @param contents The dimensions to give to the SubspaceWrapper.
+     */
     public SubspaceWrapper(Iterator<Integer> contents) {
         LinkedList<Integer> list = new LinkedList<>();
         Iterators.addAll(list, contents);
         this.wrapped = list;
     }
 
+    /**
+     * Initialize a SubspaceWrapper with these dimensions.
+     * @param wrapped The dimensions to give to the SubspaceWrapper.
+     */
     public SubspaceWrapper(Iterable<Integer> wrapped) {
-    this.wrapped = wrapped;
-  }
+        this.wrapped = wrapped;
+    }
 
+    /**
+     * Initialize a SubspaceWrapper with these dimensions.
+     * @param contents The dimensions to give to the SubspaceWrapper.
+     */
     public SubspaceWrapper(Integer... contents) {
         this.wrapped = Arrays.asList(contents);
     }
