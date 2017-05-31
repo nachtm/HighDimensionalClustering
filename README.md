@@ -27,7 +27,7 @@ It is very easy to use, and is itself contained in this repository.
 
 To build our project and run its tests, run `./gradlew build`.
 
-To run an arbitrary class within our project (with runtime dependencies in scope), run `./run CLASS ARGS...` or `python3 run.py CLASS ARGS`.
+To run an arbitrary class within our project (with runtime dependencies in scope), run `./run CLASS ARGS...` or `python3 run.py CLASS ARGS...`.
 
 If you are assessing this project, you will probably just want to run the visualizer.
 This can be done with `./gradlew vis`.
