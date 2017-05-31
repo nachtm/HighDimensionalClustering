@@ -124,15 +124,47 @@ class Trie implements Clustering {
             };
         }
 
+
+        /** Subspace extension algorithm. Suppose you are to creating the k+1'th
+         * level of the tree (so you are finding candidate k+1-subspaces and
+         * their clusters). The idea is to traverse the tree, at each level in
+         * your current traversal keeping track of what will end up being all of
+         * the k-1 subspaces with clusters that are subspaces of the k subspace
+         * at each leaf. Once a leaf is reached, the current leaf might be
+         * extended to each dimensions that is both greater than the last
+         * dimension in the path to the leaf and a child of each k-1 subspace
+         * that has been kept track of.  In such a way, the resulting subspace
+         * has every single subspace contained in the trie already.  This union
+         * of all of the clusters in all of these subspaces of the subspace in
+         * question is then clustered in the k+1 subspace being investigates. If
+         * there are any clusters, these clusters are added to the trie at a
+         * newly extended leaf corresponding to this k+1 subspace.
+         *
+         * This is accomplished in a single traversal, without any nested
+         * traversals, which may seem surprising. The trade-off is keeping track
+         * of a list of other nodes (in marks) that was described above. The
+         * number of nodes being kept track of at any step in the traversal is
+         * equal to k+1, which is small compared to the size of the tree.
+         *
+         * This is a pretty involved algorithm, as it involves fusing a bunch of
+         * things into just one traversal. As mentioned in our paper, it doesn't
+         * effect the asymptotic runtime of SUBCLU, but it is conjecturally both
+         * more efficient and niftier (though much more involved) then what is
+         * proposed in the SUBCLU paper.
+         */
         boolean extend(int k, Node[] marks, LinkedList<Integer> path) {
 
             if (this.children == null) {
+                // We are at a leaf. Try to extend. First collect a set of
+                // possible extensions based on A-priori.
                 Set<Integer> candidates = new HashSet<>(marks[0].children.keySet());
                 for (int i = 1; i < k; i++) {
                     candidates.retainAll(marks[i].children.keySet());
                 }
                 this.children = new HashMap<>();
                 for (Integer extension : candidates) {
+                    // Determine whether each candidate extension actually has
+                    // any clusters, as is done in the SUBCLU paper.
                     if (extension > this.upEdge) {
                         path.addLast(extension);
                         Node bestSubspace = this;
@@ -153,6 +185,8 @@ class Trie implements Clustering {
                 }
                 return !this.children.isEmpty();
             } else {
+                // We haven't yet reached a leaf. Recurse to each child, passing
+                // modifying the list of marks for each one.
                 boolean extended = false;
                 marks[k] = this;
                 int stopIx = k;
