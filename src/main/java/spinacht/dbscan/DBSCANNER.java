@@ -12,7 +12,7 @@ import java.util.Collection;
 public interface DBSCANNER {
 
     /**
-     * DBSCANs throught setOfPoints in order to find clusters in the relevant subspace
+     * DBSCANs setOfPoints in order to find clusters in the relevant subspace
      * @param space the dimensions we should use to calculate distance
      * @param setOfPoints the set of points we are clustering
      * @return The collection of subsets that represent a single-subspace clustering
