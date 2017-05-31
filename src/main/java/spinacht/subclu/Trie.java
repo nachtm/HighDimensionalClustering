@@ -14,7 +14,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 
-/** This class is complicated. It implements SUBCLU using a trie. It can be
+/**
+ * This class is complicated. It implements SUBCLU using a trie. It can be
  * opaquely traversed after clustering is done to retrieve clusters.
  *
  * Edges in this trie correspond to dimensions and nodes correspond to subspaces

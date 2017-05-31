@@ -11,7 +11,7 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 /**
- * Program that runs DBSCAN on a space-seperated, and prints the number of clusters along with the execution time.
+ * Program that runs DBSCAN on a space-separated, and prints the number of clusters along with the execution time.
  * usage: demo.DBSCANLameFile FILE NDIMS EPS MINPTS
  */
 public class DBSCANLameFile {
