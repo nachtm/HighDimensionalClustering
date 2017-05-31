@@ -8,7 +8,9 @@ import spinacht.data.*;
 import java.io.File;
 import java.nio.file.Paths;
 
-
+/**
+ * Tests for spinacht.index.Index
+ */
 public class IndexTest extends TestCase {
 
     public IndexTest(String testName) {
@@ -19,6 +21,10 @@ public class IndexTest extends TestCase {
         return new TestSuite(IndexTest.class);
     }
 
+    /**
+     * Just makes sure nothing crashes.
+     * @throws Exception
+     */
     public void test() throws Exception {
 
         Database<Point> db = DataUtil.fromLameFile(3, Paths.get(getClass().getClassLoader().getResource("test.csv").getFile()));
