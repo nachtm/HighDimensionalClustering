@@ -3,12 +3,19 @@ package spinacht.index;
 import java.util.function.Consumer;
 import java.util.function.ToDoubleFunction;
 
-// snippets of rb-tree from http://algs4.cs.princeton.edu/33balanced/RedBlackBST.java.html
+/**
+ * Range Tree implemented as a Red-Black Tree.
+ * Some snippets of rb-tree from http://algs4.cs.princeton.edu/33balanced/RedBlackBST.java.html
+ * @param <T>
+ */
 class RangeTree<T> {
 
-    private static final boolean RED   = true;
+    private static final boolean RED = true;
     private static final boolean BLACK = false;
 
+    /**
+     * Simple Red-Black Tree node
+     */
     private class Node {
 
         private T val;
@@ -25,10 +32,21 @@ class RangeTree<T> {
     private Node root = null;
     private final ToDoubleFunction<T> key;
 
+    /**
+     * Construct a Range Tree that compares elements on the given function.
+     * That is, it compares them using: f(x) < f(y).
+     * This allows Range Trees that only select certain dimensions to be easily constructed.
+     * @param key Function on which to compare values.
+     */
     RangeTree(ToDoubleFunction<T> key) {
         this.key = key;
     }
 
+    /**
+     * Initialize a Range Tree with the given values.
+     * @param values Values to put in tree.
+     * @param key See above.
+     */
     RangeTree(Iterable<T> values, ToDoubleFunction<T> key) {
         this(key);
         for (T value : values) {
@@ -36,10 +54,19 @@ class RangeTree<T> {
         }
     }
 
+    /**
+     * Visit and consume each value in the given inclusive range in order.
+     * @param lo Bottom of range
+     * @param hi Top of range
+     * @param consumer Function which which to touch each node traversed.
+     */
     void forEachInRange(double lo, double hi, Consumer<T> consumer) {
     traverse(root, lo, hi, consumer);
   }
 
+    /**
+     * Traverse each node in the given range below the given node.
+     */
     private void traverse(Node node, double lo, double hi, Consumer<T> consumer) {
         if (node != null) {
             if (key.applyAsDouble(node.val) < lo) {
@@ -54,6 +81,10 @@ class RangeTree<T> {
         }
     }
 
+    /**
+     * Traverse each node in the given range, where the high end of the range is not a child of this node,
+     * but rather far off to the right.
+     */
     private void traverseRight(Node node, double lo, Consumer<T> consumer) {
         if (node != null) {
             if (key.applyAsDouble(node.val) >= lo) {
@@ -64,6 +95,10 @@ class RangeTree<T> {
         }
     }
 
+    /**
+     * Traverse each node in the given range, where the low end of the range is not a child of this node,
+     * but rather far off to the left.
+     */
     private void traverseLeft(Node node, double hi, Consumer<T> consumer) {
         if (node != null) {
             traverseLeft(node.left, hi, consumer);
@@ -74,10 +109,16 @@ class RangeTree<T> {
         }
     }
 
+    /**
+     * Insert a value into the tree.
+     */
     void insert(T val) {
         root = insert(root, val);
     }
 
+    /**
+     * Insert a value into this node or one of its children.
+     */
     private Node insert(Node node, T val) {
         if (node == null) {
             return new Node(val, RED);
@@ -99,6 +140,8 @@ class RangeTree<T> {
         return node;
         }
     }
+
+    // Familiar Red-Black tree operations:
 
     private boolean isRed(Node node) {
         return node != null && node.color == RED;

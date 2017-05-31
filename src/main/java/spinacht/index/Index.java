@@ -7,9 +7,16 @@ import spinacht.data.Subspace;
 
 import java.lang.reflect.Array;
 
+/**
+ * Non-specialized indexing structure used in SUBCLU.
+ * DBSCAN itself could use an indexing structure that looks at every dimension at once, but, as discussed
+ * in both the original DBSCAN paper and our own paper, this is not feasible with SUBCLU because SUBCLU
+ * would require a seperate such structure for each subspace, which is not worth the construction cost.
 
+ */
 public class Index {
 
+    // One Range Tree for each dimension.
     private RangeTree<Point>[] trees;
 
     public Index(Database db) {
@@ -21,6 +28,15 @@ public class Index {
         }
     }
 
+    /**
+     * Return the epsilon neighborhood of the given point in the given subspace when restricted to the given subset by
+     * doing a separate range query on each dimension, and then filtering the results to take all dimensions in the
+     * subspace into account at once, and also making sure all points are in the given subset.
+     * @param eps Epsilon
+     * @param p Point around which to search
+     * @param subspace Subspace to which the search is restricted
+     * @param subset Subset to which the search is restricted
+     */
     public Subset epsNeighborhood(double eps, Point p, Subspace subspace, Subset subset) {
         Subset curr = subset;
         for (Integer i : subspace) {
