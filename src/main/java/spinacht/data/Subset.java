@@ -13,8 +13,8 @@ public class Subset extends HashSet<Point> {
      * Construct a subset.
      */
     public Subset() {
-    super();
-  }
+        super();
+    }
 
     /**
      * Construct a subset using another collection of points.

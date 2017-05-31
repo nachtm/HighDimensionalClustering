@@ -42,8 +42,8 @@ public class SubspaceWrapper implements TransparentSubspace {
 
     @Override
     public Iterator<Integer> iterator() {
-    return this.wrapped.iterator();
-  }
+        return this.wrapped.iterator();
+    }
 
     @Override
     public int hashCode() {

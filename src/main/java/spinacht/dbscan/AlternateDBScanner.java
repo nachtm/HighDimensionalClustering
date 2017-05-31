@@ -46,7 +46,7 @@ public class AlternateDBScanner implements DBSCANNER {
         return clusters.values();
     }
 
-    //cluster using a DFS through the points reachable from the seed point for each cluster.
+    //cluster using a depth-first traversal through the points reachable from the seed point for each cluster.
     private Map<Point, Integer> assignLabels(Subspace subspace, Subset subset) {
         //initialize variables
         Map<Point, Integer> labels = new HashMap<>();
@@ -68,7 +68,7 @@ public class AlternateDBScanner implements DBSCANNER {
                     Queue<Point> reachable = new LinkedList<>(); // contains only points density-reachable from `point`
                     reachable.addAll(neighborhood);
 
-                    //do a DFS through all reachable points from the seed, adding them to the queue if they are also core points
+                    //do traverse all reachable points from the seed, adding them to the queue if they are also core points
                     while (!reachable.isEmpty()) {
                         Point subSeed = reachable.poll();
                         labels.put(subSeed, clusterId);

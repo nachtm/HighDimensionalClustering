@@ -136,7 +136,7 @@ public class FifaDatabase extends ArrayList<Point> implements Database<Point> {
 		subset.stream().map(p -> ((Player) p)
 				.getPrefPos())
 				.forEach(p -> counts.compute(p, (key, val) -> val == null ? 1 : val + 1));
-//		int maxCount = counts.keySet().stream().mapToInt(k -> counts.get(k)).max().orElse(-1);
+				//int maxCount = counts.keySet().stream().mapToInt(k -> counts.get(k)).max().orElse(-1);
         double maxCount = -1;
         String ppos = null;
         for(Map.Entry<String, Integer> e : counts.entrySet()){
