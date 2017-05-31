@@ -2,6 +2,8 @@
 
 This is Micah Nacht and Nick Spinale's final project for CS324 (Data Mining).
 
+A live version of this project can be found here: https://github.com/nachtm/HighDimensionalClustering
+
 Our paper can be found at `./spinacht.pdf`.
 
 ## Structure
