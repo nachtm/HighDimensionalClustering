@@ -18,6 +18,7 @@ This package contains:
 *   A desktop application for interactively clustering using SUBCLU in two dimensions (`spinacht.visualizer`).
 *   Programs for applying our implementation to specific data sets (`spinacht.analysis`).
     There were written for us to analyze our implementations along with specific data sets, and are not meant to be user-facing.
+*   Scripts for analyzing the outputs of our analysis (`./scripts`). These are also not meant to be user-facing, though if you would like to use them please don't hesitate to ask and we can provide some instruction.  
 
 ## Usage
 
