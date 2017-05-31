@@ -1,10 +1,7 @@
 package demo;
 
 import spinacht.Params;
-import spinacht.data.Clustering;
-import spinacht.data.Database;
-import spinacht.data.Point;
-import spinacht.data.Subspace;
+import spinacht.data.*;
 import spinacht.subclu.SUBCLU;
 
 import java.io.File;
@@ -89,18 +86,16 @@ public class FifaDatabase extends ArrayList<Point> implements Database<Point> {
 		}
 		assert db != null;
 
-		Clustering clustering = SUBCLU.go(new Params(5, 100, db), true);
+		Clustering clustering = SUBCLU.go(new Params(10, 200, db), true);
 
 		clustering.forEachCluster(subspace -> {
 			File out = new File(OUT_FILE);
-			try(FileWriter fw = new FileWriter(out, true)){
-				fw.append(Subspace.pprint(subspace) + "\n");
-			} catch(IOException e){
-				System.err.println(e);
-				System.exit(1);
-			}
+
 			return subset -> {
+				Stats sim = getClusterSimilarity(subset);
 				try(FileWriter fw = new FileWriter(out, true)){
+				    fw.append(Subspace.pprint(subspace));
+					fw.append(sim.getSim() + "\t" + sim.getPos() + "\n");
 					fw.append("\t" + subset.toString() + "\n");
 				} catch(IOException e){
 					System.err.println(e);
@@ -109,18 +104,50 @@ public class FifaDatabase extends ArrayList<Point> implements Database<Point> {
 			};
 		});
 
-		clustering.forEachCluster(subspace -> {
-
-					return subset -> {
-
-						Map<String, Integer> counts = new HashMap<>();
-						subset.stream().map(p -> ((Player) p)
-								.getPrefPos())
-								.forEach(p -> counts.compute(p, (key, val) -> val == null ? 1 : val + 1));
-						int maxCount = counts.keySet().stream().mapToInt(k -> counts.get(k)).max().orElse(-1);
-						System.out.println(((double)maxCount) / subset.size());
-					};
-				});
 		System.out.println();
 	}
+
+	private static Stats getClusterSimilarity(Subset subset){
+		Map<String, Integer> counts = new HashMap<>();
+		subset.stream().map(p -> ((Player) p)
+				.getPrefPos())
+				.forEach(p -> counts.compute(p, (key, val) -> val == null ? 1 : val + 1));
+//		int maxCount = counts.keySet().stream().mapToInt(k -> counts.get(k)).max().orElse(-1);
+        double maxCount = -1;
+        String ppos = null;
+        for(Map.Entry<String, Integer> e : counts.entrySet()){
+            if(e.getValue() > maxCount){
+                ppos = e.getKey();
+                maxCount = e.getValue();
+            }
+        }
+		return new Stats((maxCount) / subset.size(), ppos);
+	}
+
+	private static class Stats{
+
+        double sim;
+	    String pos;
+
+	    Stats(double sim, String pos){
+	        this.sim = sim;
+	        this.pos = pos;
+        }
+
+        public double getSim() {
+            return sim;
+        }
+
+        public String getPos() {
+            return pos;
+        }
+
+    }
+
+//	intro - The problem - 1 min - nick
+//	dbscan - the solution  - 2 min - micah
+//	subclu - 2 min - nick
+//	results - 2 min - micah
+//	demo - 1 min ? - nick
+
 }
