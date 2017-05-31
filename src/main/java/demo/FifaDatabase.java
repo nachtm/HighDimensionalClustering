@@ -18,12 +18,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * A database designed to hold FIFA players. Includes a main() which runs SUBCLU on an example FIFA dataset.
  * Created by Micah on 5/24/2017.
  */
 public class FifaDatabase extends ArrayList<Point> implements Database<Point> {
 
 	private int ndims;
 
+	//A Player is a point with a name and preferred position.
 	private static class Player implements Point{
 
 		private double[] data;
@@ -51,6 +53,13 @@ public class FifaDatabase extends ArrayList<Point> implements Database<Point> {
 		}
 	}
 
+	/**
+	 * Constructs a FifaDatabase from a .csv file formatted like fifa_small.csv (top row is a header with Name as
+	 * the first entry, each subsequent row is a player where the first column is their name, second is their
+	 * preferred position, and the rest are their attributes).
+	 * @param f The Path to the file in question.
+	 * @throws IOException
+	 */
 	public FifaDatabase(Path f) throws IOException {
 		Files.lines(f, StandardCharsets.ISO_8859_1)
 				.filter(line -> !line.startsWith("Name,"))
@@ -73,9 +82,20 @@ public class FifaDatabase extends ArrayList<Point> implements Database<Point> {
 	}
 
 
+	/**
+	 * The location to output the file to.
+	 */
 	public static final String OUT_FILE = "data/out.txt";
 
+	/**
+	 * Runs one run of SUBCLU on data/fifa_small.csv and saves stats about the result to OUT_FILE.
+	 * Note that currently we just append the results to the end of OUT_FILE, though this could be changed pretty
+	 * quickly.
+	 * @param args No args.
+	 */
 	public static void main(String[] args){
+
+		//Load data
 		FifaDatabase db = null;
 		try {
 			db = new FifaDatabase(Paths.get("data/fifa_small.csv"));
@@ -86,8 +106,10 @@ public class FifaDatabase extends ArrayList<Point> implements Database<Point> {
 		}
 		assert db != null;
 
+		//Cluster data
 		Clustering clustering = SUBCLU.go(new Params(10, 200, db), true);
 
+		//print stats about the data
 		clustering.forEachCluster(subspace -> {
 			File out = new File(OUT_FILE);
 
@@ -107,6 +129,8 @@ public class FifaDatabase extends ArrayList<Point> implements Database<Point> {
 		System.out.println();
 	}
 
+	//Gets the single-position similarity of a cluster, defined as the max over all positions of:
+	//(Players in cluster who play position)/(total number of players in cluster)
 	private static Stats getClusterSimilarity(Subset subset){
 		Map<String, Integer> counts = new HashMap<>();
 		subset.stream().map(p -> ((Player) p)
@@ -124,6 +148,7 @@ public class FifaDatabase extends ArrayList<Point> implements Database<Point> {
 		return new Stats((maxCount) / subset.size(), ppos);
 	}
 
+	//Holds information about the statistics of a cluster
 	private static class Stats{
 
         double sim;
@@ -143,11 +168,4 @@ public class FifaDatabase extends ArrayList<Point> implements Database<Point> {
         }
 
     }
-
-//	intro - The problem - 1 min - nick
-//	dbscan - the solution  - 2 min - micah
-//	subclu - 2 min - nick
-//	results - 2 min - micah
-//	demo - 1 min ? - nick
-
 }
