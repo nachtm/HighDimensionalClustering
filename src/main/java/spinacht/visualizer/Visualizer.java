@@ -25,6 +25,9 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
+ * Desktop application for interacting with SUBCLU.
+ * README.md contains detailed instructions on how to run and use this application.
+ *
  * Created by nachtm on 5/14/17.
  */
 public class Visualizer extends Application {
@@ -114,6 +117,9 @@ public class Visualizer extends Application {
 
     }
 
+    /**
+     * Clear all subspace canvases.
+     */
     private void clearCanvases() {
 
         view.mid.getGraphicsContext2D().setFill(Color.WHITE);
@@ -131,6 +137,9 @@ public class Visualizer extends Application {
 
     }
 
+    /**
+     * Render the current state of the database, given the state of the GUI.
+     */
     private void render() {
         if (this.view.isClustered.get()) {
             double eps = view.eps.doubleValue();
@@ -142,6 +151,9 @@ public class Visualizer extends Application {
         }
     }
 
+    /**
+     * Render the database as unclustered points.
+     */
     private void renderPoints() {
 
         clearCanvases();
@@ -162,14 +174,23 @@ public class Visualizer extends Application {
 
     }
 
+    /**
+     * Tests two subspaces for element-wise equality.
+     */
     private boolean subspaceIs(Subspace subspace, Integer... cmp) {
         return Iterables.elementsEqual(subspace, Arrays.asList(cmp));
     }
 
+    /**
+     * Return the canvas corresponding to the given subspace.
+     */
     private Canvas getCanvasOf(Subspace subspace) {
         return subspaceIs(subspace, 0) ? view.top : subspaceIs(subspace, 1) ? view.left : view.mid;
     }
 
+    /**
+     * Draw the given point on the canvas corresponding to the given subspace.
+     */
     private void drawPointIn(Point p, Subspace subspace) {
         if (subspaceIs(subspace, 0)) {
             view.top.getGraphicsContext2D().fillOval(p.get(0) - 2, 11, 5, 5);
@@ -180,6 +201,9 @@ public class Visualizer extends Application {
         }
     }
 
+    /**
+     * Draw the given epsilon neighborhood on the canvas corresponding to the given subspace.
+     */
     private void drawRegionIn(Point p, double eps, Subspace subspace) {
         if (subspaceIs(subspace, 0)) {
             view.top.getGraphicsContext2D().fillOval(p.get(0) - eps, 6, 2 * eps + 1, 14);
@@ -190,6 +214,11 @@ public class Visualizer extends Application {
         }
     }
 
+    /**
+     * Render the database with a given clustering.
+     * @param eps The epsilon used to create the clustering, for drawing neighborhoods.
+     * @param clustering The clustering itself.
+     */
     private void renderClustering(double eps, InMemoryClustering clustering) {
 
         clearCanvases();
@@ -238,12 +267,17 @@ public class Visualizer extends Application {
 
     }
 
+    // A sequence of colors to use for coloring clusters.
     private static Iterable<Color> COLORS = Iterables.cycle(Color.GREEN, Color.BLUE, Color.BROWN, Color.CADETBLUE, Color.CHOCOLATE, Color.CORNFLOWERBLUE, Color.DARKCYAN, Color.DARKGREEN, Color.MEDIUMORCHID);
+
 
     private static double backgroundComponent(double d) {
         return d + (1 - d)/2;
     }
 
+    /**
+     * Create a lighter, transparent version of a color, suitable for the background of a cluster with this color.
+     */
     private static Color background(Color c) {
         return new Color(
                 backgroundComponent(c.getRed()),
@@ -253,6 +287,12 @@ public class Visualizer extends Application {
         );
     }
 
+    /**
+     * Write a database to a file.
+     * @param file File to write to.
+     * @param db Database to write to it.
+     * @throws IOException
+     */
     static void toFile(File file, Database<Point> db) throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(file));
         for (Point p : db) {
@@ -263,6 +303,12 @@ public class Visualizer extends Application {
         writer.close();
     }
 
+    /**
+     * Load a database from a file.
+     * @param file File from which to load database.
+     * @return Database parsed from file.
+     * @throws IOException
+     */
     static Database fromFile(File file) throws IOException {
         BufferedReader reader = new BufferedReader(new FileReader(file));
         Database<Point> db = new SimpleDatabase(2);

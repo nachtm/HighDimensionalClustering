@@ -14,16 +14,22 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
-
+/**
+ * GUI component containing the entire Visualizer interface.
+ * This class exists to separate the yucky GUI initialization logic from the actual application logic.
+ */
 class View extends HBox {
 
+    // The canvases corresponding to each subspace (2-space and its 2 projections)
     final Canvas mid;
     final Canvas top;
     final Canvas left;
 
+    // Mutable parameters for DBSCAN
     final DoubleProperty eps;
     final ReadOnlyObjectProperty<Integer> minPts;
 
+    // Various buttons
     final Button clearButton;
     final Button saveButton;
     final Button loadButton;
@@ -111,10 +117,22 @@ class View extends HBox {
 
     }
 
+    /**
+     * Take snapshot of 2-space.
+     * @param params Parameters for Node.snapshot
+     * @param wi Writable image for Node.snapshot
+     * @return Result of Node.snapshot
+     */
     WritableImage snapshotSuperspace(SnapshotParameters params, WritableImage wi) {
         return this.superspace.snapshot(params, wi);
     }
 
+    /**
+     * Take snapshot of all 3 subspaces.
+     * @param params Parameters for Node.snapshot
+     * @param wi Writable image for Node.snapshot
+     * @return Result of Node.snapshot
+     */
     WritableImage snapshotAllSubspaces(SnapshotParameters params, WritableImage wi) {
         return this.allSubspaces.snapshot(params, wi);
     }

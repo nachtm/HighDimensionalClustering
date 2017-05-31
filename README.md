@@ -6,7 +6,11 @@ Our paper can be found at `./spinacht.pdf`.
 
 ## Structure
 
-Our actual work is in the package `spinacht`.
+As usual, our main source is in `src/main`, and tests are in `src/test`.
+`data` contains data sets for interactive tests and analysis.
+Some data sets are discussed in our paper.
+
+As for the source itself, our actual work is in the Java package `spinacht` (`src/main/java/spinacht`).
 This package contains implementations of DBSCAN/SUBCLU, a desktop application for interactively clustering in two dimensions, and various utility classes.
 Instructions for running and using visualizer (`spinacht.visualizer.Visualizer`) can be found below.
 

@@ -2,7 +2,9 @@ package spinacht;
 
 import spinacht.data.Database;
 
-
+/**
+ * Simple class wrapping all parameters of a SUBCLU run: epsilon, minPts, and a database.
+ */
 public class Params {
 
     private final double eps;
