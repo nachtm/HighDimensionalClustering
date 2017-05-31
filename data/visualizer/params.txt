@@ -1,0 +1,1 @@
+hidden-cluster: 30, 15

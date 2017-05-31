@@ -1,13 +1,16 @@
-package spinacht.viz;
+package spinacht.visualizer;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
+import javafx.scene.Node;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
@@ -21,10 +24,16 @@ class View extends HBox {
     final DoubleProperty eps;
     final ReadOnlyObjectProperty<Integer> minPts;
 
-    final BooleanProperty isClustered;
     final Button clearButton;
     final Button saveButton;
     final Button loadButton;
+    final Button snapshotButton;
+    final BooleanProperty isClustered;
+    final BooleanProperty isErasing;
+    final BooleanProperty hideNeighborhoods;
+
+    final private Node superspace;
+    final private Node allSubspaces;
 
     View() {
 
@@ -51,21 +60,33 @@ class View extends HBox {
 
         ToggleButton clusterToggle = new ToggleButton("Cluster");
         this.isClustered = clusterToggle.selectedProperty();
+        ToggleButton eraseToggle = new ToggleButton("Erase");
+        this.isErasing = eraseToggle.selectedProperty();
+        ToggleButton neighborhoodsToggle = new ToggleButton("Hide Neighborhoods");
+        this.hideNeighborhoods = neighborhoodsToggle.selectedProperty();
         this.clearButton = new Button("Clear");
         this.saveButton = new Button("Save");
         this.loadButton = new Button("Load");
-        HBox buttons = new HBox(5, clusterToggle, this.clearButton, this.saveButton, this.loadButton);
+        this.snapshotButton = new Button("Snapshot");
+        HBox toggles = new HBox(5, clusterToggle, eraseToggle, neighborhoodsToggle);
+        HBox buttons = new HBox(5, this.clearButton, this.saveButton, this.loadButton, this.snapshotButton);
 
         Spinner<Integer> minPtsSpinner = new Spinner<>(1, Integer.MAX_VALUE, 5, 1);
         minPtsSpinner.setEditable(true);
         this.minPts = minPtsSpinner.valueProperty();
         FlowPane minPtsInput = new FlowPane(10, 10, new Label("minPts:"), minPtsSpinner);
 
+        TextField epsValue= new TextField();
+        epsValue.setEditable(false);
+        FlowPane epsInput = new FlowPane(10, 10, new Label("eps:"), epsValue);
+
         int epsMax = 150;
         Slider epsSlider = new Slider(1, epsMax, 10);
         epsSlider.setOrientation(Orientation.HORIZONTAL);
         epsSlider.setMinWidth(2*epsMax + 1);
         epsSlider.setMaxWidth(2*epsMax + 1);
+        epsSlider.setMajorTickUnit(15);
+        epsSlider.setShowTickMarks(true);
         this.eps = epsSlider.valueProperty();
 
         Canvas epsPreview = new Canvas(2*epsMax + 1, 2*epsMax + 1);
@@ -77,17 +98,25 @@ class View extends HBox {
             gc.fillRect(0, 0, 2*epsMax + 1, 2*epsMax + 1);
             gc.setFill(Color.BLACK);
             gc.fillOval(epsMax - this.eps.get(), epsMax - this.eps.get(), 2*this.eps.get() + 1, 2*this.eps.get() + 1);
+            epsValue.setText(newVal.toString());
         });
 
         this.eps.setValue(30);
 
-        VBox controls = new VBox(10, buttons, minPtsInput, epsPreview, epsSlider);
+        VBox controls = new VBox(10, buttons, toggles, minPtsInput, epsInput, epsPreview, epsSlider);
         this.getChildren().add(controls);
 
-        // this.setStyle("-fx-focus-color: transparent;");
-        // this.setStyle("-fx-background-color: linear-gradient(to bottom, derive(-fx-text-box-border, -10%), -fx-text-box-border), linear-gradient(from 0px 0px to 0px 5px, derive(-fx-control-inner-background, -9%), -fx-control-inner-background);");
-        // this.setStyle("-fx-focus-color: -fx-control-inner-background ; -fx-faint-focus-color: -fx-control-inner-background ;");
+        this.superspace = mid;
+        this.allSubspaces = canvases;
 
+    }
+
+    WritableImage snapshotSuperspace(SnapshotParameters params, WritableImage wi) {
+        return this.superspace.snapshot(params, wi);
+    }
+
+    WritableImage snapshotAllSubspaces(SnapshotParameters params, WritableImage wi) {
+        return this.allSubspaces.snapshot(params, wi);
     }
 
 }

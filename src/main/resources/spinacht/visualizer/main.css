@@ -1,0 +1,8 @@
+.thumb {
+  -fx-background-image: url("epsilon.png");
+}
+
+.slider .thumb {
+  -fx-background-size: contain;
+  -fx-padding: 12;
+}
